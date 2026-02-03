@@ -67,12 +67,34 @@
                     </div>
                 </div>
 
-                <div>
-                    <p class="text-[11px] font-black uppercase tracking-widest text-text-muted mb-2">Ödəniş ediləcək
-                        kart nömrəsi</p>
-                    <input type="text" value="XXXX XXXX XXXX XXXX"
-                        class="w-full px-4 py-3 rounded-xl border border-border bg-white text-sm font-black tracking-widest text-zinc-700 outline-none"
-                        readonly>
+                <div class="space-y-3 bg-zinc-100 p-4 rounded-xl border border-border">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-text-muted text-center mb-2">Ödəniş
+                        Məlumatları (C2C)</p>
+
+                    <div>
+                        <p class="text-[9px] font-bold text-zinc-500 uppercase tracking-wide mb-1">Kart Sahibi</p>
+                        <input type="text" value="Kanan Aliyev" readonly
+                            class="w-full px-3 py-2 rounded-lg border border-border bg-white text-xs font-black uppercase text-zinc-800 outline-none">
+                    </div>
+
+                    <div>
+                        <p class="text-[9px] font-bold text-zinc-500 uppercase tracking-wide mb-1">Bank</p>
+                        <input type="text" value="M10 / Kapital Bank" readonly
+                            class="w-full px-3 py-2 rounded-lg border border-border bg-white text-xs font-black uppercase text-zinc-800 outline-none">
+                    </div>
+
+                    <div>
+                        <p class="text-[9px] font-bold text-zinc-500 uppercase tracking-wide mb-1">Kart Nömrəsi</p>
+                        <div class="relative">
+                            <input type="text" value="4169 7388 1463 4337" readonly
+                                class="w-full px-3 py-2 rounded-lg border border-border bg-white text-sm font-black tracking-widest text-zinc-900 outline-none font-mono">
+                            <button
+                                class="absolute right-2 top-1/2 -translate-y-1/2 text-accent hover:text-accent/80 text-xs font-bold uppercase transition-colors"
+                                onclick="navigator.clipboard.writeText('4169738814634337'); this.innerText='Kopyalandı!'; setTimeout(()=>this.innerText='Kopyala', 1500)">
+                                Kopyala
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <label class="flex items-start gap-3 text-xs font-bold text-text-muted">
