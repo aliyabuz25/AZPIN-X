@@ -84,6 +84,8 @@ app.get('/api/admin/data', async (req, res) => {
             adminClient.from('reseller_api_keys').select('*')
         ])
 
+        const { data: { users: authUsers }, error: usersError } = await adminClient.auth.admin.listUsers({ perPage: 1000 })
+
         if (orders.error) throw orders.error
         if (profiles.error) throw profiles.error
 
@@ -91,6 +93,7 @@ app.get('/api/admin/data', async (req, res) => {
             orders: orders.data || [],
             items: items.data || [],
             profiles: profiles.data || [],
+            users: authUsers || [],
             wallets: wallets.data || [],
             apis: apis.data || []
         })

@@ -507,26 +507,43 @@
     const fetchData = async () => {
       try {
         const res = await fetch('/api/admin/data', {
-            headers: { 'x-admin-key': ADMIN_SECRET }
+          headers: { 'x-admin-key': ADMIN_SECRET }
         })
-        
+
         if (!res.ok) throw new Error('API Access Denied')
         const data = await res.json()
 
         const orders = data.orders || []
         const items = data.items || []
         const profiles = data.profiles || []
-        
+        const authUsers = data.users || []
+
         // Create a map for quick profile lookup by user_id
         const profileMap = new Map(profiles.map(p => [p.user_id, p]))
 
+        // Merge Auth Users with Profiles
+        state.users = authUsers.map(u => {
+          const profile = profileMap.get(u.id)
+          return {
+            user_id: u.id,
+            email: u.email,
+            phone: u.phone || profile?.phone,
+            first_name: profile?.first_name || u.user_metadata?.first_name || u.user_metadata?.full_name?.split(' ')[0] || '',
+            last_name: profile?.last_name || u.user_metadata?.last_name || u.user_metadata?.full_name?.split(' ')[1] || '',
+            created_at: u.created_at,
+            avatar_url: profile?.avatar_url || u.user_metadata?.avatar_url
+          }
+        })
+
+        // Re-map profile lookup to use the merged user list if possible, or fallback to profileMap
+        const userMap = new Map(state.users.map(u => [u.user_id, u]))
+
         state.orders = orders.map(o => ({
           ...o,
-          profiles: profileMap.get(o.user_id) || null,
+          profiles: userMap.get(o.user_id) || profileMap.get(o.user_id) || null,
           order_items: items.filter(it => it.order_id === o.id)
         }))
 
-        state.users = profiles
         state.wallets = data.wallets || []
         state.apis = data.apis || []
         state.lastRefresh = new Date()
