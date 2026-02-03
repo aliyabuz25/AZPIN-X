@@ -154,6 +154,11 @@ app.get('/api/products', async (_req, res) => {
     }
 })
 
+// Serve Admin Panel
+app.get('/d-admin', (req, res) => {
+    res.sendFile(path.join(DIST_DIR, 'pin-admin.html'))
+})
+
 // Serve React App
 app.get(/.*/, (req, res) => {
     res.sendFile(path.join(DIST_DIR, 'index.html'))
