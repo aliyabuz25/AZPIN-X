@@ -476,6 +476,13 @@ function showSlide(idx) {
     currentSlide = idx
 }
 
+function stopSlideTimer() {
+    if (slideInterval) {
+        clearInterval(slideInterval)
+        slideInterval = null
+    }
+}
+
 function startSlideTimer() {
     stopSlideTimer()
     const el = getElements()
@@ -688,7 +695,7 @@ function initAuth() {
         if (error) {
             if (msg) {
                 // Show actual error to help debugging
-                console.error('Supabase Auth Info:', { status: error.status, message: error.message, name: error.name })
+                console.error('Supabase Auth Info:', JSON.stringify(error, null, 2))
                 msg.textContent = `Xəta (${error.status || 'N/A'}): ${error.message}`
             }
             return
