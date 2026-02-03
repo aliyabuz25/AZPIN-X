@@ -598,23 +598,6 @@ function init() {
         })
     }
 
-    // Connect Mobile Auth Buttons to Main Auth Logic
-    document.querySelectorAll('.mobile-login-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            if (mobileMenu) mobileMenu.classList.add('hidden');
-            const loginBtn = document.getElementById('login-btn');
-            if (loginBtn) loginBtn.click();
-        })
-    });
-
-    document.querySelectorAll('.mobile-register-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            if (mobileMenu) mobileMenu.classList.add('hidden');
-            const registerBtn = document.getElementById('register-btn');
-            if (registerBtn) registerBtn.click();
-        })
-    });
-
     start()
 }
 
@@ -661,6 +644,13 @@ function initAuth() {
         modal.classList.remove('hidden')
         modal.classList.add('flex')
         setMode(mode)
+
+        // Ensure mobile menu is closed when opening auth modal
+        const mobileMenu = document.getElementById('mobile-menu')
+        if (mobileMenu) {
+            mobileMenu.classList.add('hidden')
+            mobileMenu.classList.remove('flex')
+        }
     }
 
     const closeModal = () => {
@@ -694,6 +684,21 @@ function initAuth() {
         e.preventDefault()
         openModal('register')
     })
+
+    // Mobile Auth Buttons Logic
+    document.querySelectorAll('.mobile-login-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault()
+            openModal('login')
+        })
+    })
+    document.querySelectorAll('.mobile-register-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault()
+            openModal('register')
+        })
+    })
+
     closeBtn?.addEventListener('click', closeModal)
     modal?.addEventListener('click', (e) => {
         if (e.target === modal) closeModal()
