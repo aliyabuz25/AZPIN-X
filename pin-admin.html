@@ -506,19 +506,16 @@
     // DATA FETCHING
     const fetchData = async () => {
       try {
-        const [ordersRes, itemsRes, profRes, walletsRes, apisRes] = await Promise.all([
-          supabase.from('orders').select('*').order('created_at', { ascending: false }),
-          supabase.from('order_items').select('*'),
-          supabase.from('profiles').select('*'), // Fetch all profiles
-          supabase.from('reseller_wallets').select('*'),
-          supabase.from('reseller_api_keys').select('*')
-        ])
+        const res = await fetch('/api/admin/data', {
+            headers: { 'x-admin-key': ADMIN_SECRET }
+        })
+        
+        if (!res.ok) throw new Error('API Access Denied')
+        const data = await res.json()
 
-        if (ordersRes.error) throw ordersRes.error
-
-        const orders = ordersRes.data || []
-        const items = itemsRes.data || []
-        const profiles = profRes.data || []
+        const orders = data.orders || []
+        const items = data.items || []
+        const profiles = data.profiles || []
         
         // Create a map for quick profile lookup by user_id
         const profileMap = new Map(profiles.map(p => [p.user_id, p]))
@@ -530,8 +527,8 @@
         }))
 
         state.users = profiles
-        state.wallets = walletsRes.data || []
-        state.apis = apisRes.data || []
+        state.wallets = data.wallets || []
+        state.apis = data.apis || []
         state.lastRefresh = new Date()
 
         document.getElementById('last-updated').innerText = `SON YENİLƏNMƏ: ${state.lastRefresh.toLocaleTimeString()}`

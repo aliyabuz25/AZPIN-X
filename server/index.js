@@ -50,6 +50,33 @@ app.post('/api/upload', upload.fields([{ name: 'avatar' }, { name: 'receipt' }, 
     res.json({ url })
 })
 
+app.get('/api/admin/data', async (req, res) => {
+    if (!adminClient) return res.status(500).json({ error: 'Server misconfiguration: No Service Role Key' })
+    const authHeader = req.headers['x-admin-key']
+    if (authHeader !== 'admin123') return res.status(403).json({ error: 'Unauthorized' })
+
+    try {
+        const [orders, items, profiles, wallets, apis] = await Promise.all([
+            adminClient.from('orders').select('*').order('created_at', { ascending: false }),
+            adminClient.from('order_items').select('*'),
+            adminClient.from('profiles').select('*'),
+            adminClient.from('reseller_wallets').select('*'),
+            adminClient.from('reseller_api_keys').select('*')
+        ])
+
+        res.json({
+            orders: orders.data || [],
+            items: items.data || [],
+            profiles: profiles.data || [],
+            wallets: wallets.data || [],
+            apis: apis.data || []
+        })
+    } catch (e) {
+        console.error('Admin Fetch Error:', e)
+        res.status(500).json({ error: e.message })
+    }
+})
+
 const OTP_TTL_MS = 5 * 60 * 1000
 const otpStore = new Map()
 
