@@ -569,6 +569,52 @@ function init() {
         updateCategoryVisibility()
     })
 
+    // Mobile Menu Logic
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn')
+    const mobileMenu = document.getElementById('mobile-menu')
+    const mobileMenuClose = document.getElementById('mobile-menu-close')
+    const mobileAuthButtons = document.getElementById('mobile-auth-buttons')
+
+    if (mobileMenuBtn && mobileMenu) {
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.remove('hidden')
+            mobileMenu.classList.add('flex')
+        })
+    }
+
+    if (mobileMenuClose && mobileMenu) {
+        mobileMenuClose.addEventListener('click', () => {
+            mobileMenu.classList.add('hidden')
+            mobileMenu.classList.remove('flex')
+        })
+    }
+
+    if (mobileMenu) {
+        mobileMenu.addEventListener('click', (e) => {
+            if (e.target === mobileMenu) {
+                mobileMenu.classList.add('hidden')
+                mobileMenu.classList.remove('flex')
+            }
+        })
+    }
+
+    // Connect Mobile Auth Buttons to Main Auth Logic
+    document.querySelectorAll('.mobile-login-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (mobileMenu) mobileMenu.classList.add('hidden');
+            const loginBtn = document.getElementById('login-btn');
+            if (loginBtn) loginBtn.click();
+        })
+    });
+
+    document.querySelectorAll('.mobile-register-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (mobileMenu) mobileMenu.classList.add('hidden');
+            const registerBtn = document.getElementById('register-btn');
+            if (registerBtn) registerBtn.click();
+        })
+    });
+
     start()
 }
 
