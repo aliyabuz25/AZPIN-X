@@ -10,7 +10,7 @@ services:
       PORT: "5174"
       SUPABASE_URL: "https://qmrchngwatxrnnkklfwa.supabase.co"
       SUPABASE_ANON_KEY: "sb_publishable_FHdYeBLA59RTUx1SVtbBrQ__L35Ax02"
-      SUPABASE_SERVICE_ROLE_KEY: "${SUPABASE_SERVICE_ROLE_KEY}"
+      SUPABASE_SERVICE_ROLE_KEY: "sb_publishable_FHdYeBLA59RTUx1SVtbBrQ__L35Ax02"
       HUBMSG_API_KEY: "API-KEY-XXXX"
     volumes:
       - /datastore/azpin/uploads:/app/public/uploads
