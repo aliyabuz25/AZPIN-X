@@ -301,6 +301,34 @@
                     </button>
                 </div>
 
+                <!-- Mobile User Section (if logged in) -->
+                <div id="mobile-user-section" class="hidden space-y-3">
+                    <div class="p-4 bg-zinc-50 border border-border rounded-xl flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 bg-accent/10 rounded-full flex items-center justify-center text-accent">
+                                <i class="ri-user-smile-line text-xl"></i>
+                            </div>
+                            <div>
+                                <p id="mobile-user-name" class="text-sm font-black text-text">İstifadəçi</p>
+                                <p class="text-[10px] text-text-muted font-bold">Xoş gəldiniz</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button
+                        class="mobile-profile-btn w-full py-3 px-4 rounded-xl border border-border text-left text-sm font-bold flex items-center gap-3 hover:bg-zinc-100 transition-colors">
+                        <i class="ri-user-settings-line text-lg text-text-muted"></i> Profil Ayarları
+                    </button>
+                    <button
+                        class="mobile-orders-btn w-full py-3 px-4 rounded-xl border border-border text-left text-sm font-bold flex items-center gap-3 hover:bg-zinc-100 transition-colors">
+                        <i class="ri-file-list-3-line text-lg text-text-muted"></i> Sifarişlərim
+                    </button>
+                    <button
+                        class="mobile-logout-btn w-full py-3 px-4 rounded-xl border border-red-100 bg-red-50 text-red-600 text-left text-sm font-black flex items-center gap-3 hover:bg-red-100 transition-colors">
+                        <i class="ri-logout-box-line text-lg"></i> Hesabdan Çıx
+                    </button>
+                </div>
+
                 <!-- Navigation Links -->
                 <nav class="space-y-2">
                     <a href="/"

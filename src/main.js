@@ -947,19 +947,52 @@ function initAuth() {
             const val = data?.balance || 0
             balanceEl.textContent = `${val.toLocaleString('az-AZ', { minimumFractionDigits: 2 })} ₼`
         }
-        return data?.balance || 0
     }
 
+    // Mobile User Actions
+    const mobileProfileBtn = document.querySelector('.mobile-profile-btn')
+    const mobileOrdersBtn = document.querySelector('.mobile-orders-btn')
+    const mobileLogoutBtn = document.querySelector('.mobile-logout-btn')
+
+    mobileProfileBtn?.addEventListener('click', () => {
+        const mobileMenu = document.getElementById('mobile-menu')
+        if (mobileMenu) mobileMenu.classList.add('hidden');
+        openProfile()
+    })
+    mobileOrdersBtn?.addEventListener('click', () => {
+        const mobileMenu = document.getElementById('mobile-menu')
+        if (mobileMenu) mobileMenu.classList.add('hidden');
+        const ordersBtn = document.getElementById('orders-btn')
+        if (ordersBtn) ordersBtn.click()
+    })
+    mobileLogoutBtn?.addEventListener('click', async () => {
+        const mobileMenu = document.getElementById('mobile-menu')
+        if (mobileMenu) mobileMenu.classList.add('hidden');
+        await supabase.auth.signOut()
+    })
+
     const setAuthUI = async (user) => {
+        const mobileAuth = document.getElementById('mobile-auth-buttons')
+        const mobileUser = document.getElementById('mobile-user-section')
+        const mobileUserName = document.getElementById('mobile-user-name')
+
         if (user) {
             loginBtn?.classList.add('hidden')
             registerBtn?.classList.add('hidden')
             userMenu?.classList.remove('hidden')
             userMenuDropdown?.classList.add('hidden')
+
+            // Update Mobile Menu
+            if (mobileAuth) mobileAuth.classList.add('hidden')
+            if (mobileUser) mobileUser.classList.remove('hidden')
+
             if (userName) {
                 const metaName = user.user_metadata?.full_name
-                userName.textContent = metaName || user.email || 'Hesab'
+                const finalName = metaName || user.email || 'Hesab'
+                userName.textContent = finalName
+                if (mobileUserName) mobileUserName.textContent = finalName.split('@')[0]
             }
+
             fetchWallet(user.id)
             // Realtime balance sync
             supabase.channel('wallet_changes')
@@ -976,6 +1009,10 @@ function initAuth() {
             loginBtn?.classList.remove('hidden')
             registerBtn?.classList.remove('hidden')
             userMenu?.classList.add('hidden')
+
+            // Update Mobile Menu
+            if (mobileAuth) mobileAuth.classList.remove('hidden')
+            if (mobileUser) mobileUser.classList.add('hidden')
         }
     }
 
