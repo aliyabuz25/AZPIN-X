@@ -509,7 +509,7 @@
         const [ordersRes, itemsRes, profRes, walletsRes, apisRes] = await Promise.all([
           supabase.from('orders').select('*').order('created_at', { ascending: false }),
           supabase.from('order_items').select('*'),
-          supabase.from('profiles').select('*'),
+          supabase.from('profiles').select('*'), // Fetch all profiles
           supabase.from('reseller_wallets').select('*'),
           supabase.from('reseller_api_keys').select('*')
         ])
@@ -519,10 +519,13 @@
         const orders = ordersRes.data || []
         const items = itemsRes.data || []
         const profiles = profRes.data || []
+        
+        // Create a map for quick profile lookup by user_id
+        const profileMap = new Map(profiles.map(p => [p.user_id, p]))
 
         state.orders = orders.map(o => ({
           ...o,
-          profiles: profiles.find(p => p.user_id === o.user_id) || null,
+          profiles: profileMap.get(o.user_id) || null,
           order_items: items.filter(it => it.order_id === o.id)
         }))
 
