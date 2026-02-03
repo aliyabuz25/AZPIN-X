@@ -686,7 +686,7 @@ function initAuth() {
         const { data, error } = await supabase.auth.signUp({
             email,
             password,
-            options: { emailRedirectTo: `${window.location.origin}/confirm.html` }
+            options: { emailRedirectTo: `${window.location.origin}/confirm` }
         })
         if (submitBtn) {
             submitBtn.disabled = false
