@@ -35,7 +35,7 @@ services:
     labels:
       - 'traefik.enable=true'
       - 'traefik.docker.network=edge'
-      - 'traefik.http.routers.azpin.rule=Host(`azpinx.com`)'
+      - 'traefik.http.routers.azpin.rule=Host(`azpinx.com`) || Host(`azpinx.octotech.az`)'
       - 'traefik.http.routers.azpin.entrypoints=web'
       - 'traefik.http.services.azpin.loadbalancer.server.port=80'
 
