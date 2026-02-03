@@ -396,24 +396,27 @@ export const CartManager = {
         }
 
         list.innerHTML = this.items.map(item => `
-            <div class="flex items-center gap-4 p-4 border-b border-border/50 group">
-                <img src="${item.image}" class="w-16 h-16 rounded-xl object-cover bg-surface border border-border">
-                <div class="flex-1">
-                    <h4 class="text-xs font-black text-black  uppercase line-clamp-1">${item.name}</h4>
-                    <p class="text-xs font-bold text-accent mt-1">${(item.price * item.quantity).toFixed(2)} ₼</p>
-                    <div class="flex items-center gap-3 mt-2">
-                        <button onclick="window.Cart.updateQuantity('${item.id}', -1)" class="w-6 h-6 rounded-lg bg-zinc-100  flex items-center justify-center hover:bg-accent hover:text-white transition-colors">
-                            <i class="ri-subtract-line text-xs font-bold"></i>
-                        </button>
-                        <span class="text-xs font-black w-4 text-center">${item.quantity}</span>
-                        <button onclick="window.Cart.updateQuantity('${item.id}', 1)" class="w-6 h-6 rounded-lg bg-zinc-100  flex items-center justify-center hover:bg-accent hover:text-white transition-colors">
-                            <i class="ri-add-line text-xs font-bold"></i>
+            <div class="flex items-start gap-3 p-3 border-b border-border/50 group bg-white">
+                <img src="${item.image}" class="w-12 h-12 rounded-lg object-cover bg-surface border border-border shrink-0">
+                <div class="flex-1 min-w-0">
+                    <h4 class="text-[11px] font-black text-black uppercase line-clamp-1 leading-tight">${item.name}</h4>
+                    <p class="text-[11px] font-bold text-accent mt-0.5">${(item.price * item.quantity).toFixed(2)} ₼</p>
+                    
+                    <div class="flex items-center justify-between mt-2">
+                        <div class="flex items-center gap-2 bg-zinc-100 rounded-lg p-0.5">
+                            <button onclick="window.Cart.updateQuantity('${item.id}', -1)" class="w-6 h-6 rounded-md bg-white shadow-sm flex items-center justify-center text-zinc-600 hover:text-accent active:scale-95 transition-all">
+                                <i class="ri-subtract-line text-xs"></i>
+                            </button>
+                            <span class="text-[11px] font-black w-4 text-center text-zinc-700">${item.quantity}</span>
+                            <button onclick="window.Cart.updateQuantity('${item.id}', 1)" class="w-6 h-6 rounded-md bg-white shadow-sm flex items-center justify-center text-zinc-600 hover:text-accent active:scale-95 transition-all">
+                                <i class="ri-add-line text-xs"></i>
+                            </button>
+                        </div>
+                        <button onclick="window.Cart.remove('${item.id}')" class="w-7 h-7 flex items-center justify-center text-zinc-400 hover:text-red-500 transition-colors bg-zinc-50 rounded-lg">
+                            <i class="ri-delete-bin-line text-sm"></i>
                         </button>
                     </div>
                 </div>
-                <button onclick="window.Cart.remove('${item.id}')" class="p-2 text-zinc-300 hover:text-accent transition-colors opacity-0 group-hover:opacity-100">
-                    <i class="ri-delete-bin-line text-lg"></i>
-                </button>
             </div>
         `).join('');
 
