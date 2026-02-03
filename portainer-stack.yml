@@ -5,8 +5,10 @@ services:
     restart: unless-stopped
     environment:
       PORT: "5174"
+      SUPABASE_URL: "https://qmrchngwatxrnnkklfwa.supabase.co"
+      SUPABASE_ANON_KEY: "sb_publishable_FHdYeBLA59RTUx1SVtbBrQ__L35Ax02"
       SUPABASE_SERVICE_ROLE_KEY: "${SUPABASE_SERVICE_ROLE_KEY}"
-      HUBMSG_API_KEY: "${HUBMSG_API_KEY}"
+      HUBMSG_API_KEY: "API-KEY-XXXX"
     volumes:
       - /datastore/azpin/uploads:/app/public/uploads
     networks:
@@ -16,6 +18,9 @@ services:
     image: azpin-frontend:latest
     container_name: azpin-frontend
     restart: unless-stopped
+    environment:
+      VITE_SUPABASE_URL: "https://qmrchngwatxrnnkklfwa.supabase.co"
+      VITE_SUPABASE_ANON_KEY: "sb_publishable_FHdYeBLA59RTUx1SVtbBrQ__L35Ax02"
     volumes:
       - /datastore/azpin/nginx-logs:/app/nginx-logs
     networks:

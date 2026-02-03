@@ -24,7 +24,7 @@ app.use((req, res, next) => {
 
 app.use(express.json())
 
-const SUPABASE_URL = 'https://qmrchngwatxrnnkklfwa.supabase.co'
+const SUPABASE_URL = process.env.SUPABASE_URL || 'https://qmrchngwatxrnnkklfwa.supabase.co'
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 const adminClient = SERVICE_ROLE_KEY ? createClient(SUPABASE_URL, SERVICE_ROLE_KEY) : null
 
