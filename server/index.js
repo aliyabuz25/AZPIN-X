@@ -57,7 +57,7 @@ app.post('/api/upload', upload.fields([{ name: 'avatar' }, { name: 'receipt' }, 
 
 app.get('/api/admin/data', async (req, res) => {
     if (!adminClient) {
-        console.error('Admin API Error: Missing SUPABASE_SERVICE_ROLE_KEY')
+        console.error('Admin API Error: SUPABASE_SERVICE_ROLE_KEY is missing or invalid')
         return res.status(500).json({ error: 'Server Config Error: Missing Service Role Key' })
     }
 
@@ -76,7 +76,7 @@ app.get('/api/admin/data', async (req, res) => {
     }
 
     try {
-        const [orders, items, profiles, wallets, apis] = await Promise.all([
+        const [ordersRes, itemsRes, profilesRes, walletsRes, apisRes] = await Promise.all([
             adminClient.from('orders').select('*').order('created_at', { ascending: false }),
             adminClient.from('order_items').select('*'),
             adminClient.from('profiles').select('*'),
@@ -84,21 +84,44 @@ app.get('/api/admin/data', async (req, res) => {
             adminClient.from('reseller_api_keys').select('*')
         ])
 
-        const { data: { users: authUsers }, error: usersError } = await adminClient.auth.admin.listUsers({ perPage: 1000 })
+        // Handle potential query errors
+        const checkError = (res, name) => {
+            if (res.error) {
+                console.error(`${name} Query Error:`, res.error)
+                return true
+            }
+            return false
+        }
 
-        if (orders.error) throw orders.error
-        if (profiles.error) throw profiles.error
+        const errors = []
+        if (checkError(ordersRes, 'Orders')) errors.push('orders')
+        if (checkError(itemsRes, 'Items')) errors.push('items')
+        if (checkError(profilesRes, 'Profiles')) errors.push('profiles')
+
+        // List Users (Requires Service Role Key)
+        let authUsers = []
+        try {
+            const { data: usersData, error: usersError } = await adminClient.auth.admin.listUsers({ perPage: 1000 })
+            if (usersError) {
+                console.error('Supabase listUsers error (Only works with Service Role Key):', usersError)
+            } else {
+                authUsers = usersData?.users || []
+            }
+        } catch (authErr) {
+            console.error('Supabase Auth Admin Call Failed:', authErr.message)
+        }
 
         res.json({
-            orders: orders.data || [],
-            items: items.data || [],
-            profiles: profiles.data || [],
-            users: authUsers || [],
-            wallets: wallets.data || [],
-            apis: apis.data || []
+            orders: ordersRes.data || [],
+            items: itemsRes.data || [],
+            profiles: profilesRes.data || [],
+            users: authUsers,
+            wallets: walletsRes.data || [],
+            apis: apisRes.data || [],
+            queryErrors: errors.length > 0 ? errors : null
         })
     } catch (e) {
-        console.error('Admin Fetch Error:', e)
+        console.error('Admin Fetch General Error:', e)
         res.status(500).json({ error: e.message || 'Database error' })
     }
 })
