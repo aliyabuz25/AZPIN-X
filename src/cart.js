@@ -32,13 +32,13 @@ export const CartManager = {
     },
 
     remove(id) {
-        this.items = this.items.filter(item => item.id !== id);
+        this.items = this.items.filter(item => String(item.id) !== String(id));
         this.save();
         this.render();
     },
 
     updateQuantity(id, delta) {
-        const item = this.items.find(i => i.id === id);
+        const item = this.items.find(i => String(i.id) === String(id));
         if (item) {
             item.quantity += delta;
             if (item.quantity <= 0) this.remove(id);
@@ -402,16 +402,16 @@ export const CartManager = {
                     <h4 class="text-xs font-black text-black  uppercase line-clamp-1">${item.name}</h4>
                     <p class="text-xs font-bold text-accent mt-1">${(item.price * item.quantity).toFixed(2)} ₼</p>
                     <div class="flex items-center gap-3 mt-2">
-                        <button onclick="window.Cart.updateQuantity(${item.id}, -1)" class="w-6 h-6 rounded-lg bg-zinc-100  flex items-center justify-center hover:bg-accent hover:text-white transition-colors">
+                        <button onclick="window.Cart.updateQuantity('${item.id}', -1)" class="w-6 h-6 rounded-lg bg-zinc-100  flex items-center justify-center hover:bg-accent hover:text-white transition-colors">
                             <i class="ri-subtract-line text-xs font-bold"></i>
                         </button>
                         <span class="text-xs font-black w-4 text-center">${item.quantity}</span>
-                        <button onclick="window.Cart.updateQuantity(${item.id}, 1)" class="w-6 h-6 rounded-lg bg-zinc-100  flex items-center justify-center hover:bg-accent hover:text-white transition-colors">
+                        <button onclick="window.Cart.updateQuantity('${item.id}', 1)" class="w-6 h-6 rounded-lg bg-zinc-100  flex items-center justify-center hover:bg-accent hover:text-white transition-colors">
                             <i class="ri-add-line text-xs font-bold"></i>
                         </button>
                     </div>
                 </div>
-                <button onclick="window.Cart.remove(${item.id})" class="p-2 text-zinc-300 hover:text-accent transition-colors opacity-0 group-hover:opacity-100">
+                <button onclick="window.Cart.remove('${item.id}')" class="p-2 text-zinc-300 hover:text-accent transition-colors opacity-0 group-hover:opacity-100">
                     <i class="ri-delete-bin-line text-lg"></i>
                 </button>
             </div>
