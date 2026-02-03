@@ -30,7 +30,12 @@ app.use(express.json())
 
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://qmrchngwatxrnnkklfwa.supabase.co'
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-const adminClient = SERVICE_ROLE_KEY ? createClient(SUPABASE_URL, SERVICE_ROLE_KEY) : null
+const adminClient = SERVICE_ROLE_KEY ? createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
+    auth: {
+        autoRefreshToken: false,
+        persistSession: false
+    }
+}) : null
 
 const storage = multer.diskStorage({
     destination: (_req, _file, cb) => cb(null, UPLOAD_DIR),
@@ -51,9 +56,24 @@ app.post('/api/upload', upload.fields([{ name: 'avatar' }, { name: 'receipt' }, 
 })
 
 app.get('/api/admin/data', async (req, res) => {
-    if (!adminClient) return res.status(500).json({ error: 'Server misconfiguration: No Service Role Key' })
-    const authHeader = req.headers['x-admin-key']
-    if (authHeader !== 'admin123') return res.status(403).json({ error: 'Unauthorized' })
+    if (!adminClient) {
+        console.error('Admin API Error: Missing SUPABASE_SERVICE_ROLE_KEY')
+        return res.status(500).json({ error: 'Server Config Error: Missing Service Role Key' })
+    }
+
+    // Check Auth
+    let token = req.headers['x-admin-key']
+    if (!token && req.headers.authorization) {
+        const parts = req.headers.authorization.split(' ')
+        if (parts.length === 2 && parts[0] === 'Bearer') {
+            token = parts[1]
+        }
+    }
+
+    if (token !== 'admin123') {
+        console.warn('Admin API Error: Unauthorized access attempt')
+        return res.status(403).json({ error: 'Unauthorized: Invalid Admin Key' })
+    }
 
     try {
         const [orders, items, profiles, wallets, apis] = await Promise.all([
@@ -64,6 +84,9 @@ app.get('/api/admin/data', async (req, res) => {
             adminClient.from('reseller_api_keys').select('*')
         ])
 
+        if (orders.error) throw orders.error
+        if (profiles.error) throw profiles.error
+
         res.json({
             orders: orders.data || [],
             items: items.data || [],
@@ -73,7 +96,7 @@ app.get('/api/admin/data', async (req, res) => {
         })
     } catch (e) {
         console.error('Admin Fetch Error:', e)
-        res.status(500).json({ error: e.message })
+        res.status(500).json({ error: e.message || 'Database error' })
     }
 })
 
