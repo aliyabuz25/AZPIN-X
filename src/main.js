@@ -687,9 +687,9 @@ function initAuth() {
         }
         if (error) {
             if (msg) {
-                msg.textContent = error.status === 500
-                    ? 'Qeydiyyat hazırda bağlıdır. Supabase Auth ayarlarını yoxlayın.'
-                    : error.message
+                // Show actual error to help debugging
+                console.error('Supabase Auth Info:', { status: error.status, message: error.message, name: error.name })
+                msg.textContent = `Xəta (${error.status || 'N/A'}): ${error.message}`
             }
             return
         }
