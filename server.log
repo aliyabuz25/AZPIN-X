@@ -1,0 +1,6 @@
+
+> azpin-x@0.0.0 server
+> node server/index.js
+
+Upload server running on 5174
+HEAD /api/products

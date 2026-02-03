@@ -1,0 +1,1 @@
+import"./modulepreload-polyfill-B5Qt9EMX.js";import{s as a}from"./supabase-eU6qekuo.js";const e=async()=>{const{data:t}=await a.auth.getSession();t?.session&&(window.location.href="/")};a.auth.onAuthStateChange((t,o)=>{o&&(window.location.href="/")});e();setInterval(e,5e3);

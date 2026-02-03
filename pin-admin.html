@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="az" class="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AZPIN-X | Admin Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --accent: #dc143c;
+      --accent-soft: rgba(220, 20, 60, 0.1);
+      --bg: #0b0b0d;
+      --surface: #121217;
+      --border: #1f1f26;
+      --text: #f8fafc;
+      --text-muted: #9aa3b2;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .glass {
+      background: rgba(18, 18, 23, 0.8);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+    }
+
+    .sidebar-link.active {
+      background: var(--accent-soft);
+      border-right: 3px solid var(--accent);
+      color: var(--accent);
+    }
+
+    .sidebar-link {
+      transition: all 0.2s ease;
+    }
+
+    .sidebar-link:hover:not(.active) {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 10px;
+    }
+
+    .animate-in {
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .stat-card {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stat-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    input,
+    select,
+    textarea {
+      background: var(--surface) !important;
+      border-color: var(--border) !important;
+      color: var(--text) !important;
+    }
+
+    input:focus {
+      border-color: var(--accent) !important;
+      ring-color: var(--accent) !important;
+    }
+
+    .badge-paid {
+      background: #059669;
+      color: white;
+    }
+
+    .badge-pending {
+      background: #d97706;
+      color: white;
+    }
+
+    .badge-review {
+      background: #2563eb;
+      color: white;
+    }
+
+    .badge-cancelled {
+      background: #dc2626;
+      color: white;
+    }
+  </style>
+</head>
+
+<body class="overflow-hidden h-screen flex">
+
+  <!-- LOGIN SCREEN -->
+  <div id="login-overlay" class="fixed inset-0 z-[9999] bg-[#0b0b0d] flex items-center justify-center p-4">
+    <div class="glass w-full max-w-md p-8 rounded-2xl shadow-2xl animate-in">
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-extrabold tracking-tighter text-white mb-2">AZPIN-X <span
+            class="text-[#dc143c]">PORTAL</span></h1>
+        <p class="text-gray-400">Admin paneli üçün giriş edin</p>
+      </div>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold uppercase text-gray-500 mb-1 ml-1">Giriş Açarı</label>
+          <input type="password" id="admin-key"
+            class="w-full px-4 py-3 rounded-xl border border-gray-800 bg-gray-900 focus:outline-none transition-all placeholder-gray-600"
+            placeholder="••••••••••••">
+        </div>
+        <button id="btn-login"
+          class="w-full bg-[#dc143c] text-white py-3 rounded-xl font-bold hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-[#dc143c]/20">Giriş
+          Et</button>
+      </div>
+      <p id="login-error" class="text-red-500 text-sm mt-4 text-center opacity-0 transition-opacity">Yalnış giriş açarı!
+      </p>
+    </div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="app-container" class="flex w-full h-full opacity-0 pointer-events-none transition-opacity duration-500">
+
+    <!-- SIDEBAR -->
+    <aside class="w-64 border-r border-[#1f1f26] flex flex-col h-full glass">
+      <div class="p-6 border-b border-[#1f1f26]">
+        <h2 class="text-xl font-bold tracking-tighter">AZPIN-X <span class="text-[#dc143c]">ADMIN</span></h2>
+      </div>
+
+      <nav class="flex-1 py-4 space-y-1 overflow-y-auto custom-scrollbar">
+        <a href="#" data-section="dashboard"
+          class="sidebar-link active flex items-center px-6 py-3 text-sm font-medium">
+          <i data-lucide="layout-dashboard" class="w-4 h-4 mr-3"></i> Dashboard
+        </a>
+        <a href="#" data-section="orders" class="sidebar-link flex items-center px-6 py-3 text-sm font-medium">
+          <i data-lucide="shopping-cart" class="w-4 h-4 mr-3"></i> Sifarişlər
+          <span id="pending-badge" class="ml-auto bg-[#dc143c] text-[10px] px-1.5 py-0.5 rounded-full hidden">0</span>
+        </a>
+        <a href="#" data-section="products" class="sidebar-link flex items-center px-6 py-3 text-sm font-medium">
+          <i data-lucide="package" class="w-4 h-4 mr-3"></i> Məhsullar
+        </a>
+        <a href="#" data-section="users" class="sidebar-link flex items-center px-6 py-3 text-sm font-medium">
+          <i data-lucide="users" class="w-4 h-4 mr-3"></i> İstifadəçilər
+        </a>
+        <a href="#" data-section="wallets" class="sidebar-link flex items-center px-6 py-3 text-sm font-medium">
+          <i data-lucide="wallet" class="w-4 h-4 mr-3"></i> Balanslar
+        </a>
+        <a href="#" data-section="apis" class="sidebar-link flex items-center px-6 py-3 text-sm font-medium">
+          <i data-lucide="key" class="w-4 h-4 mr-3"></i> API-lər
+        </a>
+      </nav>
+
+      <div class="p-4 border-t border-[#1f1f26]">
+        <div class="flex items-center p-3 rounded-xl bg-gray-900/50">
+          <div class="w-8 h-8 rounded-full bg-[#dc143c] flex items-center justify-center text-xs font-bold mr-3">A</div>
+          <div class="flex-1 min-w-0">
+            <p class="text-xs font-bold truncate text-white">Administrator</p>
+            <p class="text-[10px] text-gray-500 truncate">Sistem Təsdiqlənib</p>
+          </div>
+          <button id="btn-logout"
+            class="p-1.5 hover:bg-gray-800 rounded-lg text-gray-500 hover:text-white transition-colors">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="flex-1 flex flex-col min-w-0 bg-[#0b0b0d]">
+
+      <!-- TOPBAR -->
+      <header class="h-16 border-b border-[#1f1f26] flex items-center justify-between px-8 glass shrink-0">
+        <div class="flex items-center">
+          <h3 id="current-section-title" class="text-lg font-bold tracking-tight">Dashboard</h3>
+          <span id="last-updated"
+            class="ml-4 text-[10px] text-gray-500 uppercase tracking-widest font-bold border border-gray-800 px-2 py-0.5 rounded">Yenilənir...</span>
+        </div>
+        <div class="flex items-center space-x-4">
+          <div class="flex items-center px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/20">
+            <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse mr-2"></div>
+            <span class="text-[11px] font-bold text-green-500 uppercase">Supabase Connected</span>
+          </div>
+          <button id="btn-refresh-all"
+            class="p-2 hover:bg-gray-800 rounded-full text-gray-400 hover:text-white transition-all">
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- PANELS -->
+      <div class="flex-1 overflow-y-auto custom-scrollbar p-8">
+
+        <!-- DASHBOARD PANEL -->
+        <div id="panel-dashboard" class="panel space-y-8 animate-in">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="stat-card p-6 rounded-2xl glass space-y-2">
+              <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Ümumi Satış</p>
+              <h4 id="stat-total-revenue" class="text-3xl font-black text-white">0.00 ₼</h4>
+              <p class="text-[11px] text-green-500 font-bold">+12% keçən aydan</p>
+            </div>
+            <div class="stat-card p-6 rounded-2xl glass space-y-2">
+              <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Aktiv Sifariş</p>
+              <h4 id="stat-active-orders" class="text-3xl font-black text-white">0</h4>
+              <p class="text-[11px] text-yellow-500 font-bold">Onay gözləyir</p>
+            </div>
+            <div class="stat-card p-6 rounded-2xl glass space-y-2">
+              <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Yeni Üzvlər</p>
+              <h4 id="stat-total-users" class="text-3xl font-black text-white">0</h4>
+              <p class="text-[11px] text-blue-500 font-bold">Son 30 gün</p>
+            </div>
+            <div class="stat-card p-6 rounded-2xl glass space-y-2">
+              <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Gözləyən Ödəniş</p>
+              <h4 id="stat-pending-revenue" class="text-3xl font-black text-white">0.00 ₼</h4>
+              <p class="text-[11px] text-red-500 font-bold">Təsdiq lazımdır</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 p-6 rounded-2xl glass h-80 flex flex-col">
+              <h5 class="text-sm font-bold mb-4">Satış Qrafiki (Son 7 Gün)</h5>
+              <div class="flex-1 relative">
+                <canvas id="sales-chart"></canvas>
+              </div>
+            </div>
+            <div class="p-6 rounded-2xl glass h-80 flex flex-col">
+              <h5 class="text-sm font-bold mb-4">Məhsul Paylanması</h5>
+              <div class="flex-1 relative">
+                <canvas id="product-chart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ORDERS PANEL -->
+        <div id="panel-orders" class="panel hidden animate-in space-y-6">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="relative">
+                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"></i>
+                <input type="text" id="order-search"
+                  class="pl-10 pr-4 py-2 rounded-xl text-sm w-80 bg-gray-900 border-none ring-1 ring-gray-800"
+                  placeholder="Sifariş ID, Telefon veya Məhsul...">
+              </div>
+              <select id="order-status-filter"
+                class="px-4 py-2 rounded-xl text-sm bg-gray-900 border-none ring-1 ring-gray-800">
+                <option value="all">Bütün Statuslar</option>
+                <option value="pending">Gözləyir</option>
+                <option value="pending_review">Review</option>
+                <option value="paid">Tamamlanıb</option>
+                <option value="cancelled">İptal</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="rounded-2xl glass overflow-hidden">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-gray-900/50 border-b border-[#1f1f26]">
+                <tr>
+                  <th class="px-6 py-4 font-bold text-gray-500 uppercase text-[10px] tracking-wider">İD & Tarix</th>
+                  <th class="px-6 py-4 font-bold text-gray-500 uppercase text-[10px] tracking-wider">Müştəri</th>
+                  <th class="px-6 py-4 font-bold text-gray-500 uppercase text-[10px] tracking-wider">Məhsullar</th>
+                  <th class="px-6 py-4 font-bold text-gray-500 uppercase text-[10px] tracking-wider">Məbləğ</th>
+                  <th class="px-6 py-4 font-bold text-gray-500 uppercase text-[10px] tracking-wider">Status</th>
+                  <th class="px-6 py-4 font-bold text-gray-500 uppercase text-[10px] tracking-wider text-right">
+                    Əməliyyat</th>
+                </tr>
+              </thead>
+              <tbody id="orders-list" class="divide-y divide-[#1f1f26]"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- PRODUCTS PANEL -->
+        <div id="panel-products" class="panel hidden animate-in space-y-6">
+          <div class="flex items-center space-x-4 mb-4">
+            <div class="relative flex-1">
+              <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"></i>
+              <input type="text" id="product-search"
+                class="pl-10 pr-4 py-2 rounded-xl text-sm w-full bg-gray-900 border-none ring-1 ring-gray-800"
+                placeholder="Katoloqdan axtar...">
+            </div>
+            <button id="btn-sync-products"
+              class="bg-[#dc143c] text-white px-6 py-2 rounded-xl text-sm font-bold flex items-center shrink-0">
+              <i data-lucide="refresh-cw" class="w-4 h-4 mr-2"></i> Sync API
+            </button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4" id="products-list">
+            <!-- Products here -->
+          </div>
+        </div>
+
+        <!-- USERS PANEL -->
+        <div id="panel-users" class="panel hidden animate-in space-y-6">
+          <div class="rounded-2xl glass overflow-hidden">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-gray-900/50 border-b border-[#1f1f26]">
+                <tr>
+                  <th class="px-6 py-4 font-bold text-gray-500 uppercase text-[10px] tracking-wider text-center w-16">
+                    Avatar</th>
+                  <th class="px-6 py-4 font-bold text-gray-500 uppercase text-[10px] tracking-wider">Ad Soyad</th>
+                  <th class="px-6 py-4 font-bold text-gray-500 uppercase text-[10px] tracking-wider">Email</th>
+                  <th class="px-6 py-4 font-bold text-gray-500 uppercase text-[10px] tracking-wider">Telefon</th>
+                  <th class="px-6 py-4 font-bold text-gray-500 uppercase text-[10px] tracking-wider text-right">
+                    Qeydiyyat</th>
+                </tr>
+              </thead>
+              <tbody id="users-list" class="divide-y divide-[#1f1f26]"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- WALLETS PANEL -->
+        <div id="panel-wallets" class="panel hidden animate-in space-y-6">
+          <div class="flex justify-end">
+            <button id="btn-add-wallet"
+              class="bg-[#dc143c] text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center">
+              <i data-lucide="plus" class="w-4 h-4 mr-2"></i> Yeni Balans
+            </button>
+          </div>
+          <div class="rounded-2xl glass overflow-hidden">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-gray-900/50 border-b border-[#1f1f26]">
+                <tr>
+                  <th class="px-6 py-4 font-bold text-gray-500 uppercase text-[10px] tracking-wider">Reseller ID</th>
+                  <th class="px-6 py-4 font-bold text-gray-500 uppercase text-[10px] tracking-wider text-center">Valyuta
+                  </th>
+                  <th class="px-6 py-4 font-bold text-gray-500 uppercase text-[10px] tracking-wider">Balans</th>
+                  <th class="px-6 py-4 font-bold text-gray-500 uppercase text-[10px] tracking-wider text-right">
+                    Əməliyyat</th>
+                </tr>
+              </thead>
+              <tbody id="wallets-list" class="divide-y divide-[#1f1f26]"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- APIS PANEL -->
+        <div id="panel-apis" class="panel hidden animate-in space-y-6">
+          <div class="rounded-2xl glass overflow-hidden">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-gray-900/50 border-b border-[#1f1f26]">
+                <tr>
+                  <th class="px-6 py-4 font-bold text-gray-500 uppercase text-[10px] tracking-wider">Reseller ID</th>
+                  <th class="px-6 py-4 font-bold text-gray-500 uppercase text-[10px] tracking-wider">API Key</th>
+                  <th class="px-6 py-4 font-bold text-gray-500 uppercase text-[10px] tracking-wider">Status</th>
+                  <th class="px-6 py-4 font-bold text-gray-500 uppercase text-[10px] tracking-wider text-right">
+                    Əməliyyat</th>
+                </tr>
+              </thead>
+              <tbody id="apis-list" class="divide-y divide-[#1f1f26]"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- USER SELECTOR MODAL -->
+    <div id="user-selector-modal"
+      class="fixed inset-0 z-[1000] bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+      <div class="glass w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[80vh]">
+        <div class="p-6 border-b border-[#1f1f26] flex items-center justify-between">
+          <h4 class="text-xl font-bold">İstifadəçi Seçin</h4>
+          <button id="close-user-selector" class="p-2 hover:bg-gray-800 rounded-lg text-gray-500 hover:text-white">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+        <div class="p-4 bg-gray-900/50 flex items-center border-b border-[#1f1f26]">
+          <i data-lucide="search" class="w-4 h-4 text-gray-500 mr-3"></i>
+          <input type="text" id="user-selector-search" class="bg-transparent border-none focus:ring-0 text-sm w-full"
+            placeholder="Ad, email və ya telefon ilə axtar...">
+        </div>
+        <div class="flex-1 overflow-y-auto custom-scrollbar p-2" id="user-selector-list">
+          <!-- Users dynamic -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+    const SUPABASE_URL = 'https://qmrchngwatxrnnkklfwa.supabase.co'
+    const SUPABASE_ANON_KEY = 'sb_publishable_FHdYeBLA59RTUx1SVtbBrQ__L35Ax02'
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+    const ADMIN_SECRET = 'admin123'
+    const LISANS_API = {
+      URL: '/api'
+    }
+
+    // STATE
+    let state = {
+      orders: [],
+      users: [],
+      wallets: [],
+      apis: [],
+      products: [],
+      lastRefresh: null,
+      search: '',
+      statusFilter: 'all',
+      charts: {
+        sales: null,
+        products: null
+      }
+    }
+
+    // AUTH LOGIC
+    const checkAuth = () => {
+      if (sessionStorage.getItem('admin_session') === 'true') {
+        showApp()
+      }
+    }
+
+    const showApp = () => {
+      document.getElementById('login-overlay').classList.add('hidden')
+      const app = document.getElementById('app-container')
+      app.classList.remove('opacity-0', 'pointer-events-none')
+      init()
+    }
+
+    document.getElementById('btn-login').addEventListener('click', () => {
+      const key = document.getElementById('admin-key').value
+      if (key === ADMIN_SECRET) {
+        sessionStorage.setItem('admin_session', 'true')
+        showApp()
+      } else {
+        const err = document.getElementById('login-error')
+        err.classList.remove('opacity-0')
+        setTimeout(() => err.classList.add('opacity-0'), 3000)
+      }
+    })
+
+    document.getElementById('btn-logout').addEventListener('click', () => {
+      sessionStorage.removeItem('admin_session')
+      location.reload()
+    })
+
+    // NAVIGATION
+    document.querySelectorAll('.sidebar-link').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault()
+        const section = link.dataset.section
+        switchPanel(section)
+      })
+    })
+
+    const switchPanel = (id) => {
+      document.querySelectorAll('.panel').forEach(p => p.classList.add('hidden'))
+      document.getElementById(`panel-${id}`).classList.remove('hidden')
+
+      document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'))
+      document.querySelector(`[data-section="${id}"]`).classList.add('active')
+
+      document.getElementById('current-section-title').innerText = id.charAt(0).toUpperCase() + id.slice(1)
+      lucide.createIcons()
+
+      if (id === 'products' && state.products.length === 0) fetchCatalog()
+    }
+
+    // UTILS
+    const fmt = (n) => Number(n || 0).toLocaleString('az-AZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    const toast = (msg, type = 'accent') => {
+      const t = document.createElement('div')
+      t.className = `fixed bottom-8 right-8 px-6 py-3 rounded-xl glass border-l-4 font-bold text-sm animate-in z-[10000] flex items-center shadow-2xl shrink-0`
+      t.style.borderLeftColor = type === 'success' ? '#059669' : (type === 'error' ? '#dc2626' : '#dc143c')
+      t.innerHTML = `<i data-lucide="${type === 'success' ? 'check-circle' : 'info'}" class="w-4 h-4 mr-3"></i> ${msg}`
+      document.body.appendChild(t)
+      lucide.createIcons()
+      setTimeout(() => {
+        t.style.opacity = '0'
+        t.style.transform = 'translateY(10px)'
+        setTimeout(() => t.remove(), 500)
+      }, 3000)
+    }
+
+    // DATA FETCHING
+    const fetchData = async () => {
+      try {
+        const [ordersRes, itemsRes, profRes, walletsRes, apisRes] = await Promise.all([
+          supabase.from('orders').select('*').order('created_at', { ascending: false }),
+          supabase.from('order_items').select('*'),
+          supabase.from('profiles').select('*'),
+          supabase.from('reseller_wallets').select('*'),
+          supabase.from('reseller_api_keys').select('*')
+        ])
+
+        if (ordersRes.error) throw ordersRes.error
+
+        const orders = ordersRes.data || []
+        const items = itemsRes.data || []
+        const profiles = profRes.data || []
+
+        state.orders = orders.map(o => ({
+          ...o,
+          profiles: profiles.find(p => p.user_id === o.user_id) || null,
+          order_items: items.filter(it => it.order_id === o.id)
+        }))
+
+        state.users = profiles
+        state.wallets = walletsRes.data || []
+        state.apis = apisRes.data || []
+        state.lastRefresh = new Date()
+
+        document.getElementById('last-updated').innerText = `SON YENİLƏNMƏ: ${state.lastRefresh.toLocaleTimeString()}`
+        updateStats()
+        renderAll()
+      } catch (err) {
+        console.error(err)
+        toast('Məlumatlar yüklenərkən xəta: ' + err.message, 'error')
+      }
+    }
+
+    const fetchCatalog = async () => {
+      try {
+        const r = await fetch(`${LISANS_API.URL}/products`)
+        const d = await r.json()
+        state.products = d.data?.products || []
+        renderProducts()
+      } catch (e) {
+        toast('Katalog yüklənə bilmədi', 'error')
+      }
+    }
+
+    const updateStats = () => {
+      const stats = state.orders.reduce((acc, o) => {
+        if (o.status === 'paid') acc.revenue += o.total
+        if (o.status === 'pending' || o.status === 'pending_review') {
+          acc.activeCount++
+          acc.pendingRevenue += o.total
+        }
+        return acc
+      }, { revenue: 0, activeCount: 0, pendingRevenue: 0 })
+
+      document.getElementById('stat-total-revenue').innerText = `${fmt(stats.revenue)} ₼`
+      document.getElementById('stat-active-orders').innerText = stats.activeCount
+      document.getElementById('stat-total-users').innerText = state.users.length
+      document.getElementById('stat-pending-revenue').innerText = `${fmt(stats.pendingRevenue)} ₼`
+
+      const pBadge = document.getElementById('pending-badge')
+      if (stats.activeCount > 0) {
+        pBadge.innerText = stats.activeCount
+        pBadge.classList.remove('hidden')
+      } else {
+        pBadge.classList.add('hidden')
+      }
+    }
+
+    // RENDERING
+    const renderAll = () => {
+      renderOrders()
+      renderUsers()
+      renderWallets()
+      renderApis()
+      updateCharts()
+    }
+
+    const renderOrders = () => {
+      const list = document.getElementById('orders-list')
+      let filtered = state.orders.filter(o => {
+        const matchSearch = state.search === '' ||
+          o.id.toLowerCase().includes(state.search.toLowerCase()) ||
+          (o.profiles?.phone || '').includes(state.search) ||
+          (o.profiles?.first_name || '').toLowerCase().includes(state.search.toLowerCase())
+
+        const matchStatus = state.statusFilter === 'all' || o.status === state.statusFilter
+        return matchSearch && matchStatus
+      })
+
+      list.innerHTML = filtered.map(o => {
+        const date = new Date(o.created_at).toLocaleString('az-AZ', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+        const itemsList = o.order_items?.map(i => `<span class="bg-gray-800 text-[10px] px-1.5 py-0.5 rounded border border-gray-700 mr-1 mb-1 inline-block">${i.name} ×${i.quantity}</span>`).join('') || '-'
+        const customer = o.profiles ? `<div><p class="font-bold text-white">${o.profiles.first_name} ${o.profiles.last_name}</p><p class="text-[10px] text-gray-500">${o.profiles.phone}</p></div>` : '<span class="text-gray-500">Qonaq</span>'
+        const statusClass = `badge-${o.status}`
+
+        return `
+          <tr class="hover:bg-gray-900/30 transition-colors group">
+            <td class="px-6 py-4">
+              <p class="font-mono text-[11px] text-gray-400">#${o.id.slice(0, 8)}</p>
+              <p class="text-[10px] text-gray-500 font-bold uppercase">${date}</p>
+            </td>
+            <td class="px-6 py-4">${customer}</td>
+            <td class="px-6 py-4 max-w-xs ring-0 outline-none">${itemsList}</td>
+            <td class="px-6 py-4 font-black text-white text-base">${fmt(o.total)} ₼</td>
+            <td class="px-6 py-4">
+              <span class="text-[10px] px-2 py-0.5 rounded-full font-black uppercase ${statusClass}">${o.status}</span>
+            </td>
+            <td class="px-6 py-4 text-right">
+               <div class="flex items-center justify-end space-x-2">
+                 ${o.receipt_url ? `<a href="${o.receipt_url}" target="_blank" class="p-2 hover:bg-blue-500/10 text-blue-400 rounded-lg transition-all" title="Dekonta Bax"><i data-lucide="image" class="w-4 h-4"></i></a>` : ''}
+                 ${o.status !== 'paid' ? `<button onclick="updateOrderStatus('${o.id}', 'paid')" class="p-2 hover:bg-green-500/10 text-green-500 rounded-lg transition-all" title="Təhvil Verildi"><i data-lucide="check-circle" class="w-4 h-4"></i></button>` : ''}
+                 ${o.status === 'pending' ? `<button onclick="updateOrderStatus('${o.id}', 'pending_review')" class="p-2 hover:bg-yellow-500/10 text-yellow-500 rounded-lg transition-all" title="İncelemeye Al"><i data-lucide="eye" class="w-4 h-4"></i></button>` : ''}
+                 ${o.status !== 'cancelled' && o.status !== 'paid' ? `<button onclick="updateOrderStatus('${o.id}', 'cancelled')" class="p-2 hover:bg-red-500/10 text-red-500 rounded-lg transition-all" title="İptal Et"><i data-lucide="x-circle" class="w-4 h-4"></i></button>` : ''}
+               </div>
+            </td>
+          </tr>
+        `
+      }).join('') || '<tr><td colspan="6" class="px-6 py-10 text-center text-gray-500 italic">Sifariş tapılmadı</td></tr>'
+      lucide.createIcons()
+    }
+
+    const renderProducts = () => {
+      const list = document.getElementById('products-list')
+      const search = document.getElementById('product-search').value.toLowerCase()
+
+      const filtered = state.products.filter(p => p.name.toLowerCase().includes(search))
+      list.innerHTML = filtered.map(p => `
+        <div class="p-4 rounded-xl glass border border-gray-800 flex flex-col space-y-3">
+          <img src="${p.image || 'https://dummyimage.com/200x200/1f1f26/9aa3b2.png?text=AZPIN-X'}" class="w-full aspect-square object-contain bg-white/5 rounded-lg">
+          <div class="flex-1">
+            <p class="text-[10px] text-[#dc143c] font-black uppercase">${p.category_name || 'Markasız'}</p>
+            <h5 class="text-[11px] font-bold text-white line-clamp-2 leading-tight h-8 mb-2">${p.name}</h5>
+            <p class="text-sm font-black text-white">${fmt(p.price)} ₼</p>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${p.stock > 0 ? 'bg-green-500/10 text-green-500 border border-green-500/20' : 'bg-red-500/10 text-red-500 border border-red-500/20'} uppercase">
+              ${p.stock > 0 ? 'Stokda var' : 'Bitib'}
+            </span>
+          </div>
+        </div>
+      `).join('')
+    }
+
+    const renderUsers = () => {
+      const list = document.getElementById('users-list')
+      list.innerHTML = state.users.map(u => {
+        const initials = ((u.first_name?.[0] || '') + (u.last_name?.[0] || '')).toUpperCase() || '?'
+        return `
+          <tr class="hover:bg-gray-900/30 transition-colors">
+            <td class="px-6 py-4 text-center">
+               <div class="w-10 h-10 rounded-full bg-gray-800 border border-gray-700 mx-auto flex items-center justify-center font-black text-xs text-gray-400 overflow-hidden">
+                 ${u.avatar_url ? `<img src="${u.avatar_url}" class="w-full h-full object-cover">` : initials}
+               </div>
+            </td>
+            <td class="px-6 py-4 font-bold text-white">${u.first_name} ${u.last_name}</td>
+            <td class="px-6 py-4 text-gray-400">${u.email}</td>
+            <td class="px-6 py-4 text-gray-400 font-mono">${u.phone || '-'}</td>
+            <td class="px-6 py-4 text-right text-xs text-gray-500">${u.created_at ? new Date(u.created_at).toLocaleDateString() : '-'}</td>
+          </tr>
+        `
+      }).join('')
+    }
+
+    const renderWallets = () => {
+      const list = document.getElementById('wallets-list')
+      list.innerHTML = state.wallets.map(w => `
+        <tr class="hover:bg-gray-900/30">
+          <td class="px-6 py-4 font-mono text-xs text-gray-400">${w.reseller_id}</td>
+          <td class="px-6 py-4 text-center font-bold text-gray-500">${w.currency}</td>
+          <td class="px-6 py-4 font-black text-lg text-white">${fmt(w.balance)}</td>
+          <td class="px-6 py-4 text-right">
+            <button onclick="editWallet('${w.reseller_id}', ${w.balance})" class="text-xs font-bold text-[#dc143c] hover:underline">Balansı Dəyiş</button>
+          </td>
+        </tr>
+      `).join('')
+    }
+
+    const renderApis = () => {
+      const list = document.getElementById('apis-list')
+      list.innerHTML = state.apis.map(a => `
+        <tr class="hover:bg-gray-900/30 font-mono">
+          <td class="px-6 py-4 text-xs text-gray-400">${a.reseller_id}</td>
+          <td class="px-6 py-4 text-xs text-blue-400">${a.api_key}</td>
+          <td class="px-6 py-4">
+             <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase ${a.active ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}">
+               ${a.active ? 'Aktiv' : 'Pasiv'}
+             </span>
+          </td>
+          <td class="px-6 py-4 text-right">
+            <button onclick="toggleApi('${a.id}', ${a.active})" class="text-xs font-bold text-[#dc143c] hover:underline">${a.active ? 'Deaktiv et' : 'Aktiv et'}</button>
+          </td>
+        </tr>
+      `).join('')
+    }
+
+    // CHARTS
+    const updateCharts = () => {
+      const canvasSales = document.getElementById('sales-chart')
+      const canvasProds = document.getElementById('product-chart')
+      if (!canvasSales || !canvasProds) return
+
+      // Sales Data
+      const days = [...Array(7)].map((_, i) => {
+        const d = new Date()
+        d.setDate(d.getDate() - (6 - i))
+        return d.toLocaleDateString('en-CA')
+      })
+      const salesData = days.map(day => state.orders.filter(o => o.status === 'paid' && o.created_at.startsWith(day)).reduce((sum, o) => sum + o.total, 0))
+
+      if (state.charts.sales) state.charts.sales.destroy()
+      state.charts.sales = new Chart(canvasSales, {
+        type: 'line',
+        data: {
+          labels: days.map(d => d.split('-').slice(1).join('/')),
+          datasets: [{ label: 'Satış (₼)', data: salesData, borderColor: '#dc143c', backgroundColor: 'rgba(220, 20, 60, 0.1)', fill: true, tension: 0.4, borderWidth: 3 }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#1f1f26' }, ticks: { color: '#6b7280' } }, x: { grid: { display: false }, ticks: { color: '#6b7280' } } } }
+      })
+
+      // Product Distribution
+      const productCounts = {}
+      state.orders.forEach(o => o.order_items?.forEach(i => { productCounts[i.name] = (productCounts[i.name] || 0) + i.quantity }))
+      const prodLabels = Object.keys(productCounts).slice(0, 5)
+      const prodValues = prodLabels.map(l => productCounts[l])
+
+      if (state.charts.products) state.charts.products.destroy()
+      state.charts.products = new Chart(canvasProds, {
+        type: 'doughnut',
+        data: { labels: prodLabels, datasets: [{ data: prodValues, backgroundColor: ['#dc143c', '#2563eb', '#059669', '#d97706', '#7c3aed'], borderWidth: 0 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#9aa3b2', font: { size: 10 } } } } }
+      })
+    }
+
+    // ACTIONS (GLOBAL)
+    window.updateOrderStatus = async (id, status) => {
+      try {
+        const order = state.orders.find(o => o.id === id)
+        const updates = { status }
+
+        // If PAID, update payments too
+        if (status === 'paid' && order) {
+          const { data: existing } = await supabase.from('payments').select('id').eq('order_id', id).maybeSingle()
+          const pData = { order_id: id, amount: order.total, status: 'paid', method: 'c2c' }
+          if (existing) await supabase.from('payments').update({ status: 'paid' }).eq('id', existing.id)
+          else await supabase.from('payments').insert(pData)
+        }
+
+        const { error } = await supabase.from('orders').update(updates).eq('id', id)
+        if (error) throw error
+        toast(`Sifariş #${id.slice(0, 8)} statusu '${status}' olaraq dəyişdirildi`, 'success')
+        fetchData()
+      } catch (err) {
+        toast('Xəta: ' + err.message, 'error')
+      }
+    }
+
+    window.editWallet = async (id, current) => {
+      const next = prompt(`Reseller ${id} üçün yeni balans:`, current)
+      if (next === null) return
+      const amount = parseFloat(next)
+      if (isNaN(amount)) return toast('Düzgün məbləğ daxil edin', 'error')
+
+      try {
+        const { error } = await supabase.from('reseller_wallets').upsert({ reseller_id: id, balance: amount, currency: 'AZN' }, { onConflict: 'reseller_id' })
+        if (error) throw error
+        toast('Balans yeniləndi', 'success')
+        fetchData()
+      } catch (err) {
+        toast('Xəta: ' + err.message, 'error')
+      }
+    }
+
+    window.toggleApi = async (id, active) => {
+      try {
+        const { error } = await supabase.from('reseller_api_keys').update({ active: !active }).eq('id', id)
+        if (error) throw error
+        toast('API statusu dəyişdirildi', 'success')
+        fetchData()
+      } catch (err) {
+        toast('Xəta: ' + err.message, 'error')
+      }
+    }
+
+    document.getElementById('order-search').addEventListener('input', (e) => {
+      state.search = e.target.value
+      renderOrders()
+    })
+
+    document.getElementById('order-status-filter').addEventListener('change', (e) => {
+      state.statusFilter = e.target.value
+      renderOrders()
+    })
+
+    document.getElementById('product-search').addEventListener('input', renderProducts)
+    document.getElementById('btn-sync-products').addEventListener('click', fetchCatalog)
+    document.getElementById('btn-refresh-all').addEventListener('click', fetchData)
+
+    document.getElementById('btn-add-wallet').addEventListener('click', () => {
+      openUserSelector()
+    })
+
+    const openUserSelector = () => {
+      const modal = document.getElementById('user-selector-modal')
+      modal.classList.remove('hidden')
+      modal.classList.add('flex')
+      renderUserSelectorList()
+      lucide.createIcons()
+    }
+
+    const closeUserSelector = () => {
+      const modal = document.getElementById('user-selector-modal')
+      modal.classList.add('hidden')
+      modal.classList.remove('flex')
+    }
+
+    document.getElementById('close-user-selector').onclick = closeUserSelector
+    document.getElementById('user-selector-search').oninput = (e) => renderUserSelectorList(e.target.value)
+
+    const renderUserSelectorList = (filter = '') => {
+      const list = document.getElementById('user-selector-list')
+      const f = filter.toLowerCase()
+      const filteredUsers = state.users.filter(u =>
+        (u.first_name || '').toLowerCase().includes(f) ||
+        (u.last_name || '').toLowerCase().includes(f) ||
+        (u.email || '').toLowerCase().includes(f) ||
+        (u.phone || '').includes(f)
+      )
+
+      list.innerHTML = filteredUsers.map(u => `
+        <div onclick="selectUserForWallet('${u.user_id}', '${u.first_name || ''} ${u.last_name || ''}')" class="p-3 hover:bg-gray-800 rounded-xl cursor-pointer flex items-center group transition-all">
+          <div class="w-10 h-10 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center font-black text-xs text-gray-500 mr-4 overflow-hidden">
+            ${u.avatar_url ? `<img src="${u.avatar_url}" class="w-full h-full object-cover">` : (u.first_name?.[0] || '?')}
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-bold text-white truncate">${u.first_name || ''} ${u.last_name || ''}</p>
+            <p class="text-[11px] text-gray-500 truncate">${u.email || ''}</p>
+          </div>
+          <p class="text-[11px] font-mono text-gray-600 bg-gray-900 px-2 py-1 rounded hidden group-hover:block">${u.user_id}</p>
+        </div>
+      `).join('') || '<p class="text-center p-10 text-gray-600 italic">İstifadəçi tapılmadı</p>'
+    }
+
+    window.selectUserForWallet = (userId, name) => {
+      closeUserSelector()
+      window.editWallet(userId, 0)
+    }
+
+    // INIT
+    const init = () => {
+      fetchData()
+      setInterval(fetchData, 60000)
+      lucide.createIcons()
+    }
+
+    window.onload = checkAuth
+
+  </script>
+</body>
+
+</html>

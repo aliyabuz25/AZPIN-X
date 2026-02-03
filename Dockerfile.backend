@@ -1,0 +1,23 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Bağımlılıkları kopyala
+COPY package.json package-lock.json* ./
+
+# Bağımlılıkları yükle
+RUN npm install
+
+# Server dosyalarını kopyala
+COPY server ./server
+COPY .env* ./
+
+# Port ve Env
+ENV PORT=5174
+ENV HOST=0.0.0.0
+ENV NODE_ENV=production
+
+EXPOSE 5174
+
+# Uygulamayı başlat
+CMD ["node", "server/index.js"]
