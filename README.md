@@ -14,6 +14,7 @@ Sunucuda aşağıdaki klasör yapısının hazır olduğundan emin olun:
 /datastore/azpin/app/         # Kaynak kodlar burada olacak (ZIP'ten çıkanlar)
 /datastore/azpin/uploads/     # Kullanıcı yüklemeleri (Reseller dekont, avatar vb.) - Backend buraya yazar
 /datastore/azpin/nginx-logs/  # Nginx erişim ve hata logları
+/datastore/azpin/mysql/       # MySQL veritabanı persistency klasörü
 ```
 
 ### 2. Dosya Hazırlığı
@@ -40,20 +41,26 @@ docker build -t azpin-frontend:latest -f Dockerfile.frontend .
 ### 4. Portainer Stack Kurulumu
 Portainer arayüzünde yeni bir Stack oluşturun ve `portainer-stack.yml` dosyasının içeriğini yapıştırın.
 
-⚠️ **Önemli:** Stack Environment variables kısmına aşağıdaki gizli anahtarları eklemeyi UNUTMAYIN:
-- `SUPABASE_SERVICE_ROLE_KEY`: Supabase service role key (Admin işlemleri için)
+⚠️ **Önemli:** Stack Environment variables kısmına aşağıdaki anahtarları eklemeyi UNUTMAYIN:
+- `JWT_SECRET`: Güçlü bir gizli anahtar (ör: `azpin-super-secret-123`)
+- `DB_HOST`: `azpin-db` (Stack içi iletişim için)
+- `DB_USER`: `azpin_user`
+- `DB_PASSWORD`: Veritabanı şifresi
+- `DB_NAME`: `azpin_db`
 - `HUBMSG_API_KEY`: HubMSG SMS servisi API anahtarı
+- `MYSQL_ROOT_PASSWORD`: MySQL root şifresi (Veritabanı kurulumu için)
 
 ### 5. Yapılandırma Detayları
-Sistem iki ana konteynerdan oluşur ve **Internal Bridge Network** üzerinden haberleşir:
+Sistem üç ana konteynerdan oluşur ve **Internal Bridge Network** üzerinden haberleşir:
 
-1.  **azpin-backend (NodeJS)**: API ve dosya yükleme işlemlerini yönetir. **Dış dünyaya kapalıdır (Traefik etiketi yoktur).** Sadece internal network üzerindeki `azpin-frontend` tarafından erişilebilir.
-2.  **azpin-frontend (Nginx)**: Statik arayüzü sunar ve Reverse Proxy görevi görür.
+1.  **azpin-db (MySQL 8.0)**: Veritabanı motoru. Dışarıya kapalıdır.
+2.  **azpin-backend (NodeJS)**: API, Auth ve dosya yükleme işlemlerini yönetir. Cihaz içi cədvəlləri avtomatik yaradır.
+3.  **azpin-frontend (Nginx)**: Statik arayüzü sunar ve Reverse Proxy görevi görür.
     - `/` -> Frontend Statics
     - `/api` -> `http://azpin-backend:5174/api` (Internal Proxy)
     - `/uploads` -> `http://azpin-backend:5174/uploads` (Internal Proxy)
 
-Traefik, tüm trafiği (Host: `azpinx.com`) sadece **azpin-frontend** konteynerine yönlendirir. Backend'e doğrudan dış erişim yoktur.
+Traefik, tüm trafiği (Host: `azpinx.com`) frontend ve backend (/api) konteynerlerine yönlendirir.
 
 ### 6. Geliştirme (Local)
 Yerel ortamda geliştirmek için:
