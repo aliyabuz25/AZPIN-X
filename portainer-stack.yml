@@ -14,9 +14,6 @@ services:
       - internal
 
   azpin-backend:
-    build:
-      context: .
-      dockerfile: Dockerfile.backend
     image: azpin-backend:latest
     container_name: azpin-backend
     restart: unless-stopped
@@ -43,9 +40,6 @@ services:
       - 'traefik.http.services.azpin-api.loadbalancer.server.port=5174'
 
   azpin-frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile.frontend
     image: azpin-frontend:latest
     container_name: azpin-frontend
     restart: unless-stopped
