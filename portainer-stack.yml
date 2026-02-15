@@ -14,7 +14,7 @@ services:
       - internal
 
   azpin-backend:
-    image: azpin-backend:latest
+    image: azpin-backend:local
     container_name: azpin-backend
     restart: unless-stopped
     depends_on:
@@ -40,7 +40,7 @@ services:
       - 'traefik.http.services.azpin-api.loadbalancer.server.port=5174'
 
   azpin-frontend:
-    image: azpin-frontend:latest
+    image: azpin-frontend:local
     container_name: azpin-frontend
     restart: unless-stopped
     networks:

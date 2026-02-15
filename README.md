@@ -26,41 +26,31 @@ Proje dosyalarını sunucuya göndermeden önce yerel ortamda build almayın. T�
 Projeyi zipleyip sunucuda `/datastore/azpin/azpin.zip` konumuna atın ve `/datastore/azpin/app/` içine çıkarın.
 
 ### 3. Docker Image Build (Sunucuda)
-Portainer'ın build context sorununu aşmak için imajları sunucuda (host shell) manuel olarak build etmelisiniz:
+Portainer'ın "Pull access denied" xətasını tamamilə həll etmək üçün imajları `:local` tag-i ilə build etməliyik:
 
 ```bash
 cd /datastore/azpin/app
 
 # Backend Image Build
-docker build -t azpin-backend:latest -f Dockerfile.backend .
+docker build -t azpin-backend:local -f Dockerfile.backend .
 
-# Frontend Image Build (Bu işlem biraz sürebilir, vite build içerir)
-docker build -t azpin-frontend:latest -f Dockerfile.frontend .
+# Frontend Image Build
+docker build -t azpin-frontend:local -f Dockerfile.frontend .
 ```
 
-### 4. Portainer Stack Kurulumu
-Portainer arayüzünde yeni bir Stack oluşturun ve `portainer-stack.yml` dosyasının içeriğini yapıştırın.
-
-⚠️ **Önemli:** Stack Environment variables kısmına aşağıdaki anahtarları eklemeyi UNUTMAYIN:
-- `JWT_SECRET`: Güçlü bir gizli anahtar (ör: `azpin-super-secret-123`)
-- `DB_HOST`: `azpin-db` (Stack içi iletişim için)
-- `DB_USER`: `azpin_user`
-- `DB_PASSWORD`: Veritabanı şifresi
-- `DB_NAME`: `azpin_db`
-- `HUBMSG_API_KEY`: HubMSG SMS servisi API anahtarı
-- `MYSQL_ROOT_PASSWORD`: MySQL root şifresi (Veritabanı kurulumu için)
+### 4. Portainer Stack Kurulumu (Sorunsuz)
+1. Portainer-də yeni bir Stack yaradın.
+2. `portainer-stack.yml` faylını yapıştırın.
+3. **ÖNƏMLİ**: Deploy etməzdən əvvəl Portainer-də **"Always pull the image"** (və ya "Pull latest image") seçiminin **KAPALI** (OFF) olduğundan əmin olun.
+4. `Deploy the stack` düyməsinə basın.
 
 ### 5. Yapılandırma Detayları
-Sistem üç ana konteynerdan oluşur ve **Internal Bridge Network** üzerinden haberleşir:
+Sistem üç ana konteynerdan oluşur:
+1. **azpin-db**: MySQL verilənlər bazası.
+2. **azpin-backend**: API və Auth server.
+3. **azpin-frontend**: Statik fayllar və Nginx proxy.
 
-1.  **azpin-db (MySQL 8.0)**: Veritabanı motoru. Dışarıya kapalıdır.
-2.  **azpin-backend (NodeJS)**: API, Auth ve dosya yükleme işlemlerini yönetir. Cihaz içi cədvəlləri avtomatik yaradır.
-3.  **azpin-frontend (Nginx)**: Statik arayüzü sunar ve Reverse Proxy görevi görür.
-    - `/` -> Frontend Statics
-    - `/api` -> `http://azpin-backend:5174/api` (Internal Proxy)
-    - `/uploads` -> `http://azpin-backend:5174/uploads` (Internal Proxy)
-
-Traefik, tüm trafiği (Host: `azpinx.com`) frontend ve backend (/api) konteynerlerine yönlendirir.
+Traefik həm API (`/api`), həm də Frontend yollarını avtomatik olaraq `Host: azpinx.com` üzərinə yönləndirir.
 
 ### 6. Geliştirme (Local)
 Yerel ortamda geliştirmek için:
