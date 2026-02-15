@@ -155,17 +155,30 @@ body {
 
 .active-chip .active-chip-bg {
   border-color: var(--accent) !important;
-  background-color: var(--accent) !important;
-  box-shadow: 0 8px 20px rgba(220, 20, 60, 0.2);
+  background-color: var(--surface) !important;
+  /* Keep white for the icon container */
+  box-shadow: 0 10px 25px rgba(220, 20, 60, 0.25);
+  transform: translateY(-2px);
 }
 
 .active-chip .active-chip-bg i {
-  color: #ffffff !important;
+  color: var(--accent) !important;
 }
 
 .active-chip span {
   color: var(--accent) !important;
   font-weight: 900;
+}
+
+.cat-chip .active-chip-bg {
+  border-radius: 20px !important;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.cat-chip:hover .active-chip-bg {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.08);
+  border-color: var(--accent);
 }
 
 .active-dot {
