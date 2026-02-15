@@ -403,20 +403,33 @@
         </section>
 
         <!-- Category Chips -->
-        <section class="mt-16 notranslate">
-            <h3 class="text-sm font-black text-text-muted uppercase tracking-[0.2em] mb-6 px-1">Kategoriyalar</h3>
-            <div id="cat-chips" class="flex flex-wrap gap-3 pb-4">
-                <button id="chip-all"
-                    class="px-4 py-3 rounded-none bg-surface border border-accent text-text font-black text-[11px] uppercase tracking-wide whitespace-nowrap transition-all flex items-center gap-2 active:scale-95 cat-chip active-chip">
-                    <div class="w-8 h-8 rounded-none bg-accent/10 flex items-center justify-center">
-                        <i class="ri-apps-2-line text-lg text-accent"></i>
-                    </div>
-                    <span>Hamısı</span>
-                </button>
+        <section class="mt-12 notranslate overflow-hidden">
+            <h3 class="text-[10px] font-black text-text-muted uppercase tracking-[0.3em] mb-8 text-center opacity-50">
+                Kategoriyalar</h3>
+            <div class="relative">
+                <div id="cat-chips" class="flex items-start gap-6 overflow-x-auto pb-8 pt-2 scrollbar-hide px-4 -mx-4">
+                    <button id="chip-all"
+                        class="flex flex-col items-center gap-3 shrink-0 transition-all active:scale-95 cat-chip active-chip group">
+                        <div
+                            class="w-16 h-16 rounded-2xl bg-white shadow-sm border border-accent flex items-center justify-center group-hover:shadow-md transition-all active-chip-bg">
+                            <i class="ri-apps-2-line text-2xl text-accent"></i>
+                        </div>
+                        <span
+                            class="text-[10px] font-black uppercase tracking-tight text-accent text-center">Hamısı</span>
+                    </button>
+                </div>
+                <!-- Fade Gradients for scroll -->
+                <div
+                    class="absolute left-0 top-0 bottom-8 w-12 bg-gradient-to-r from-bg to-transparent pointer-events-none z-10">
+                </div>
+                <div
+                    class="absolute right-0 top-0 bottom-8 w-12 bg-gradient-to-l from-bg to-transparent pointer-events-none z-10">
+                </div>
             </div>
-            <div class="flex justify-center">
+
+            <div class="flex justify-center mt-2 hidden">
                 <button id="cat-toggle"
-                    class="px-4 py-2 border border-border text-[11px] font-black uppercase tracking-wide text-text-muted hover:text-text hover:border-accent transition-all">
+                    class="text-[10px] font-black uppercase tracking-widest text-text-muted hover:text-accent transition-all px-6 py-2 border border-border">
                     Daha çox
                 </button>
             </div>

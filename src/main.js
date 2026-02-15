@@ -202,45 +202,53 @@ function buildCategories() {
     const getIcon = (n) => {
         const l = n.toLowerCase()
         if (l.includes('valorant')) return 'ri-fire-line'
-        if (l.includes('pubg')) return 'ri-sword-line'
+        if (l.includes('pubg')) return 'ri-gamepad-line'
         if (l.includes('steam')) return 'ri-steam-fill'
         if (l.includes('roblox')) return 'ri-shining-line'
         if (l.includes('free fire')) return 'ri-skull-line'
         if (l.includes('riot')) return 'ri-gamepad-line'
-        if (l.includes('razer')) return 'ri-poker-cards-line'
         if (l.includes('google')) return 'ri-google-play-line'
         if (l.includes('itunes') || l.includes('apple')) return 'ri-apple-line'
         if (l.includes('xbox')) return 'ri-xbox-line'
         if (l.includes('playstation')) return 'ri-playstation-line'
         if (l.includes('nintendo')) return 'ri-nintendo-switch-line'
+        if (l.includes('netflix')) return 'ri-netflix-fill'
+        if (l.includes('spotify')) return 'ri-spotify-fill'
+        if (l.includes('tiktok')) return 'ri-tiktok-fill'
         return 'ri-focus-3-line'
     }
 
     cats.forEach(c => {
         const chip = document.createElement('button')
-        chip.className = 'px-4 py-3 rounded-none bg-surface border border-border text-text font-black text-[11px] uppercase tracking-wide whitespace-nowrap transition-all flex items-center gap-2 hover:border-accent active:scale-95 cat-chip group shadow-sm'
+        chip.className = 'flex flex-col items-center gap-3 shrink-0 transition-all active:scale-95 cat-chip'
         chip.innerHTML = `
-            <div class="w-8 h-8 rounded-none bg-zinc-100 flex items-center justify-center group-hover:bg-accent/10 transition-colors">
-                <i class="${getIcon(c)} text-lg text-accent"></i>
+            <div class="w-16 h-16 rounded-2xl bg-white shadow-sm border border-border flex items-center justify-center group-hover:shadow-md transition-all active-chip-bg">
+                <i class="${getIcon(c)} text-2xl text-accent"></i>
             </div>
-            <span class="notranslate">${c}</span>
+            <span class="text-[10px] font-black uppercase tracking-tight text-text-muted group-hover:text-accent transition-colors text-center max-w-[80px] leading-tight notranslate">${c}</span>
         `
         chip.onclick = () => {
             const catSelector = document.getElementById('cat')
             if (catSelector) catSelector.value = (catSelector.value === c) ? 'all' : c
 
             document.querySelectorAll('.cat-chip').forEach(ch => {
-                ch.classList.remove('border-accent', 'active-chip', 'bg-accent/5')
-                ch.classList.add('bg-surface', 'border-border')
+                ch.classList.remove('active-chip')
+                const inner = ch.querySelector('.active-chip-bg')
+                if (inner) inner.classList.replace('border-accent', 'border-border')
+                const text = ch.querySelector('span')
+                if (text) text.classList.replace('text-accent', 'text-text-muted')
             })
 
             const activeCat = catSelector.value
             if (activeCat === 'all') {
                 const chipAll = document.getElementById('chip-all')
-                if (chipAll) chipAll.classList.add('active-chip', 'border-accent')
+                if (chipAll) chipAll.classList.add('active-chip')
             } else {
-                chip.classList.add('border-accent', 'active-chip', 'bg-accent/5')
-                chip.classList.remove('bg-surface', 'border-border')
+                chip.classList.add('active-chip')
+                const inner = chip.querySelector('.active-chip-bg')
+                if (inner) inner.classList.replace('border-border', 'border-accent')
+                const text = chip.querySelector('span')
+                if (text) text.classList.replace('text-text-muted', 'text-accent')
             }
             draw(1)
         }
@@ -553,12 +561,23 @@ function init() {
     document.getElementById('chip-all')?.addEventListener('click', () => {
         const catSelector = document.getElementById('cat')
         if (catSelector) catSelector.value = 'all'
+
         document.querySelectorAll('.cat-chip').forEach(ch => {
-            ch.classList.remove('border-accent', 'active-chip', 'bg-accent/5')
-            ch.classList.add('bg-surface', 'border-border')
+            ch.classList.remove('active-chip')
+            const inner = ch.querySelector('.active-chip-bg')
+            if (inner) inner.classList.replace('border-accent', 'border-border')
+            const text = ch.querySelector('span')
+            if (text) text.classList.replace('text-accent', 'text-text-muted')
         })
+
         const chipAll = document.getElementById('chip-all')
-        if (chipAll) chipAll.classList.add('active-chip', 'border-accent')
+        if (chipAll) {
+            chipAll.classList.add('active-chip')
+            const inner = chipAll.querySelector('.active-chip-bg')
+            if (inner) inner.classList.replace('border-border', 'border-accent')
+            const text = chipAll.querySelector('span')
+            if (text) text.classList.replace('text-text-muted', 'text-accent')
+        }
         draw(1)
     })
 
