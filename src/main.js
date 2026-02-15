@@ -218,12 +218,24 @@ function buildCategories() {
         return 'ri-focus-3-line'
     }
 
+    const getCategoryImage = (n) => {
+        const l = n.toLowerCase()
+        if (l.includes('pubg')) return 'https://epin.az/_ipx/w_96&f_webp/https://rest.epin.az/storage/categories/oPvP5Mm6qTioNEOktahxlFJh1xeX81G5SygIzbJM.jpg'
+        if (l.includes('free fire')) return 'https://epin.az/_ipx/w_96&f_webp/https://rest.epin.az/storage/categories/cITYHPhgFR7jTRbI5cT0QM5NDUGHEdSMz8OmjSPS.webp'
+        return null
+    }
+
     cats.forEach(c => {
         const chip = document.createElement('button')
         chip.className = 'flex flex-col items-center gap-3 shrink-0 transition-all active:scale-95 cat-chip'
+        const imgUrl = getCategoryImage(c)
+        const innerContent = imgUrl
+            ? `<img src="${imgUrl}" class="w-full h-full object-cover rounded-2xl" alt="${c}">`
+            : `<i class="${getIcon(c)} text-2xl text-accent"></i>`
+
         chip.innerHTML = `
             <div class="w-16 h-16 rounded-2xl bg-white shadow-sm border border-border flex items-center justify-center group-hover:shadow-md transition-all active-chip-bg">
-                <i class="${getIcon(c)} text-2xl text-accent"></i>
+                ${innerContent}
             </div>
             <span class="text-[10px] font-black uppercase tracking-tight text-text-muted group-hover:text-accent transition-colors text-center max-w-[80px] leading-tight notranslate">${c}</span>
         `
