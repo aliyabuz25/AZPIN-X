@@ -14,10 +14,8 @@ services:
       - internal
 
   azpin-backend:
-    build:
-      context: .
-      dockerfile: Dockerfile.backend
-    image: azpin-backend:local
+    image: local/azpin-backend:latest
+    pull_policy: never
     container_name: azpin-backend
     restart: unless-stopped
     depends_on:
@@ -36,10 +34,8 @@ services:
       - internal
 
   azpin-frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile.frontend
-    image: azpin-frontend:local
+    image: local/azpin-frontend:latest
+    pull_policy: never
     container_name: azpin-frontend
     restart: unless-stopped
     depends_on:

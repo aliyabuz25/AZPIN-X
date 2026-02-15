@@ -26,23 +26,22 @@ Proje dosyalarını sunucuya göndermeden önce yerel ortamda build almayın. T�
 Projeyi zipleyip sunucuda `/datastore/azpin/azpin.zip` konumuna atın ve `/datastore/azpin/app/` içine çıkarın.
 
 ### 3. Docker Image Build (Sunucuda)
-Portainer'ın "Pull access denied" xətasını tamamilə həll etmək üçün imajları `:local` tag-i ilə build etməliyik:
+Portainer-in "Pull access denied" xətasını 100% həll etmək üçün bu komandaları işlədin:
 
 ```bash
 cd /datastore/azpin/app
 
 # Backend Image Build
-docker build -t azpin-backend:local -f Dockerfile.backend .
+docker build -t local/azpin-backend:latest -f Dockerfile.backend .
 
 # Frontend Image Build
-docker build -t azpin-frontend:local -f Dockerfile.frontend .
+docker build -t local/azpin-frontend:latest -f Dockerfile.frontend .
 ```
 
-### 4. Portainer Stack Kurulumu (Sorunsuz)
-1. Portainer-də yeni bir Stack yaradın.
-2. `portainer-stack.yml` faylını yapıştırın.
-3. **ÖNƏMLİ**: Deploy etməzdən əvvəl Portainer-də **"Always pull the image"** (və ya "Pull latest image") seçiminin **KAPALI** (OFF) olduğundan əmin olun.
-4. `Deploy the stack` düyməsinə basın.
+### 4. Portainer Stack Kurulumu (Qəti Həll)
+1. Portainer-də Stack yaradarkən `portainer-stack.yml` faylını yapıştırın.
+2. **pull_policy: never** sayəsində Portainer artıq internetdən imaj çəkməyə çalışmayacaq.
+3. `Deploy the stack` düyməsinə basın.
 
 ### 5. Yapılandırma Detayları
 Sistem üç ana konteynerdan oluşur ve **Internal Bridge Network** üzerinden haberleşir:
