@@ -1,187 +1,131 @@
 <!DOCTYPE html>
 <html lang="az">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AZPIN-X | Premium Digital Store</title>
-    <!-- Icons & Fonts -->
+    <title>AZPIN-X | Digital Marketplace</title>
+    <!-- Remix Icons -->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-    <!-- Main Style -->
 </head>
-
 <body>
-    <!-- Top Progress Line -->
-    <div id="top-line" class="fixed top-0 left-0 w-full h-1 bg-accent z-[9999]"></div>
+    <div id="page-loader">AZPIN-X</div>
 
-    <!-- Main Navigation -->
     <header>
-        <nav class="nav-container">
-            <div class="flex items-center gap-8">
-                <a href="/" class="text-2xl font-[900] tracking-tighter uppercase notranslate">AZPIN<span
-                        class="text-accent">-X</span></a>
-            </div>
+        <div class="container nav-wrap">
+            <a href="/" class="text-3xl font-black notranslate">AZPIN<span style="color:var(--accent)">-X</span></a>
+            
+            <div style="display: flex; gap: 24px; align-items: center;">
+                <nav id="nav-links" style="display: flex; gap: 32px; font-weight: 700; font-size: 14px;">
+                    <button onclick="router.go('home')" class="hover:text-accent transition-colors">Mağaza</button>
+                    <button onclick="router.go('dashboard')" class="hover:text-accent transition-colors">Panel</button>
+                </nav>
+                
+                <div id="user-area" style="display: flex; border-left: 1px solid var(--border); padding-left: 24px; gap: 16px;">
+                    <button id="auth-entry" class="btn-main">Giriş / Qeydiyyat</button>
+                    <div id="user-pill" class="hidden" style="display: flex; gap: 12px; align-items: center;">
+                        <span id="user-name" style="font-weight: 800; font-size: 13px;"></span>
+                        <button onclick="auth.logout()" style="color:var(--text-muted);"><i class="ri-logout-circle-r-line text-lg"></i></button>
+                    </div>
+                </div>
 
-            <div class="flex items-center gap-6">
-                <button id="search-toggle" class="p-2 text-text-muted hover:text-accent transition-colors"><i
-                        class="ri-search-2-line text-xl"></i></button>
-                <div id="auth-controls" class="flex items-center gap-4">
-                    <button id="login-btn" class="font-bold text-sm hover:text-accent transition-colors">Daxil
-                        Ol</button>
-                    <button id="register-btn" class="btn-primary text-sm px-6">Qeydiyyat</button>
-                </div>
-                <div id="user-controls" class="hidden flex items-center gap-4">
-                    <button id="dashboard-btn"
-                        class="font-bold text-sm hover:text-accent transition-colors">Panel</button>
-                    <button id="logout-btn" class="p-2 text-text-muted hover:text-accent"><i
-                            class="ri-logout-box-r-line"></i></button>
-                </div>
-                <button id="cart-btn"
-                    class="relative p-2 bg-surface rounded-xl border border-border hover:border-accent group transition-all">
-                    <i class="ri-shopping-cart-2-line text-xl group-hover:text-accent"></i>
-                    <span id="cart-count"
-                        class="absolute -top-1 -right-1 w-5 h-5 bg-accent text-white text-[10px] font-black rounded-full flex items-center justify-center">0</span>
+                <button id="bag-trigger" style="position: relative; background: var(--surface); border: 1px solid var(--border); width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <i class="ri-shopping-bag-3-line text-xl"></i>
+                    <span id="bag-count" style="position: absolute; -top: 8px; -right: 8px; background: var(--accent); color: white; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 900;">0</span>
                 </button>
             </div>
-        </nav>
+        </div>
     </header>
 
-    <main id="app-content">
-        <!-- Landing Section -->
-        <section id="landing-page">
-            <!-- Simplified Hero -->
-            <div class="relative w-full h-[400px] bg-surface flex items-center justify-center overflow-hidden">
-                <div class="max-w-[1280px] w-full px-6 flex items-center justify-between z-10">
-                    <div class="max-w-xl">
-                        <span class="text-accent font-black text-[10px] tracking-[0.3em] uppercase block mb-4">Yeni
-                            Gələnlər</span>
-                        <h1 class="text-5xl md:text-7xl font-[900] tracking-tighter leading-[0.9] mb-6 uppercase">
-                            Premium Oyun <br> & Rəqəmsal Kodlar</h1>
-                        <p class="text-text-muted font-medium text-sm mb-8 max-w-sm">Saniyələr içində təslimat, 24/7
-                            aktiv dəstək və ən ucuz qiymətlər.</p>
-                        <div class="flex gap-4">
-                            <button class="btn-primary">İndi Al</button>
-                            <button
-                                class="px-8 py-3 font-bold text-sm rounded-xl border border-border hover:bg-white transition-all">Kampaniyalar</button>
+    <main id="view-port">
+        <!-- Landing View -->
+        <div id="view-home" class="view fadeIn">
+            <section style="background: var(--bg); padding: 80px 0;">
+                <div class="container" style="display: flex; align-items: center; justify-content: space-between;">
+                    <div style="max-width: 600px;">
+                        <span style="color:var(--accent); font-weight: 900; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase;">Premium Marketplace</span>
+                        <h1 style="font-size: 80px; font-weight: 900; line-height: 0.9; margin: 24px 0; letter-spacing: -4px;">Oyun kodları saniyələr içində.</h1>
+                        <p style="color:var(--text-muted); font-size: 18px; font-weight: 500; margin-bottom: 40px;">Azərbaycanın ən etibarlı rəqəmsal satış portalına xoş gəldiniz.</p>
+                        <button class="btn-main" style="padding: 20px 48px; font-size: 16px;">Kəşf Et</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="discovery-section">
+                <div class="container">
+                    <h3 style="font-size: 11px; font-weight: 900; opacity: 0.4; letter-spacing: 0.3em; margin-bottom: 32px; text-transform: uppercase;">Kategoriyalara Göz At</h3>
+                    <div id="discovery-chips" class="chip-scroll">
+                        <button class="cat-item active" data-cat="all">
+                            <div class="cat-icon-box"><i class="ri-stack-line text-2xl"></i></div>
+                            <span>Qarışıq</span>
+                        </button>
+                        <!-- Injected -->
+                    </div>
+                </div>
+            </section>
+
+            <div class="container">
+                <div id="product-out" class="main-grid">
+                    <!-- Injected -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard View -->
+        <div id="view-dashboard" class="view hidden">
+            <div class="container">
+                <div class="panel-grid">
+                    <aside>
+                        <div class="panel-card" style="padding: 24px;">
+                            <div style="margin-bottom: 40px; display: flex; align-items: center; gap: 16px;">
+                                <div style="width: 56px; height: 56px; border-radius: 18px; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 900;">A</div>
+                                <div>
+                                    <h4 id="dash-name" style="font-weight: 900; font-size: 16px;">Alıcı</h4>
+                                    <p id="dash-email" style="font-size: 12px; color:var(--text-muted);"></p>
+                                </div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <button class="btn-main" style="background:var(--bg); border: 1px solid var(--border); color:var(--text); justify-content: flex-start; text-align: left;">
+                                    <i class="ri-shopping-basket-line mr-2"></i> Sifarişlərim
+                                </button>
+                                <button class="btn-main" style="background:var(--bg); border: 1px solid var(--border); color:var(--text); justify-content: flex-start; text-align: left; opacity: 0.5;">
+                                    <i class="ri-user-settings-line mr-2"></i> Parametrlər
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                <!-- Background Decoration -->
-                <div
-                    class="absolute -right-20 top-0 w-1/2 h-full bg-gradient-to-l from-accent/5 to-transparent skew-x-[-20deg]">
-                </div>
-            </div>
-
-            <!-- Category Discovery -->
-            <div class="category-discovery">
-                <div class="max-w-[1280px] mx-auto px-6">
-                    <h2 class="text-[10px] font-black uppercase tracking-[0.3em] text-text-muted opacity-50 mb-6">
-                        Kategoriyalar</h2>
-                </div>
-                <div id="cat-chips" class="scrollbar-hide">
-                    <button id="chip-all" class="cat-chip active-chip">
-                        <div class="icon-box"><i class="ri-apps-2-line text-xl"></i></div>
-                        <span>Hamısı</span>
-                    </button>
-                    <!-- Dynamically injected -->
-                </div>
-            </div>
-
-            <!-- Product Display -->
-            <div class="max-w-[1280px] mx-auto px-6 py-12">
-                <div class="flex items-center justify-between mb-12">
-                    <div>
-                        <h2 class="text-2xl font-black tracking-tight">Məhsullar</h2>
-                        <p id="count-info" class="text-xs text-text-muted font-bold mt-1">Yüklənir...</p>
-                    </div>
-                    <div class="flex gap-3">
-                        <select id="sort-select"
-                            class="px-4 py-2 bg-surface border border-border rounded-xl text-xs font-bold outline-none">
-                            <option value="new">Ən Yenilər</option>
-                            <option value="price-asc">Ucuzdan Bahaya</option>
-                        </select>
-                    </div>
-                </div>
-                <div id="out">
-                    <!-- Cards injected here -->
-                </div>
-            </div>
-        </section>
-
-        <!-- User Dashboard (Initial state: hidden) -->
-        <section id="user-dashboard" class="hidden">
-            <div class="flex items-center justify-between mb-12">
-                <h2 class="text-3xl font-black tracking-tighter">İstifadəçi Paneli</h2>
-                <div class="flex items-center gap-4">
-                    <div class="text-right">
-                        <p id="dash-user-email" class="text-xs font-black text-text-muted">user@example.com</p>
-                        <h3 id="dash-user-name" class="font-black text-sm">Xoş gəldiniz!</h3>
-                    </div>
-                    <div id="dash-avatar"
-                        class="w-12 h-12 rounded-2xl bg-surface border-2 border-accent flex items-center justify-center overflow-hidden">
-                        <i class="ri-user-smile-line text-xl text-accent"></i>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Sidebar -->
-                <div class="flex flex-col gap-2">
-                    <button
-                        class="dash-nav-btn active px-6 py-4 rounded-2xl text-left font-bold text-sm flex items-center gap-3 transition-all">
-                        <i class="ri-shopping-bag-line"></i> Sifarişlərim
-                    </button>
-                    <button
-                        class="dash-nav-btn px-6 py-4 rounded-2xl text-left font-bold text-sm flex items-center gap-3 transition-all text-text-muted hover:bg-surface">
-                        <i class="ri-settings-3-line"></i> Parametrlər
-                    </button>
-                </div>
-
-                <!-- Main Panel Area -->
-                <div class="md:col-span-2">
-                    <div id="dash-orders-view" class="bg-surface border border-border rounded-[32px] p-8 min-h-[400px]">
-                        <h3 class="font-black text-lg mb-6">Son Sifarişlər</h3>
-                        <div id="dash-orders-list" class="flex flex-col gap-4">
-                            <!-- Orders injected here -->
-                            <div class="py-20 text-center opacity-30 font-bold">Heç bir sifariş tapılmadı.</div>
+                    </aside>
+                    
+                    <main>
+                        <div class="panel-card" style="min-height: 500px;">
+                            <h2 style="font-size: 32px; font-weight: 900; letter-spacing: -1px; margin-bottom: 32px;">Sifariş Tarixçəsi</h2>
+                            <div id="order-history" style="display: flex; flex-direction: column; gap: 16px;">
+                                <!-- History -->
+                                <div style="padding: 40px; text-align: center; color: var(--text-muted); font-weight: 600; opacity: 0.5;">Hələ bir sifarişiniz yoxdur.</div>
+                            </div>
                         </div>
-                    </div>
+                    </main>
                 </div>
             </div>
-        </section>
+        </div>
     </main>
 
-    <!-- Simple Login Modal -->
-    <div id="auth-modal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="flex justify-between items-center mb-8">
-                <h3 id="auth-title" class="text-2xl font-black tracking-tighter">Giriş</h3>
-                <button id="auth-close" class="p-2 hover:bg-surface rounded-xl"><i
-                        class="ri-close-line text-xl"></i></button>
+    <!-- Global Modals -->
+    <div id="auth-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); z-index: 5000; align-items: center; justify-content: center;">
+        <div class="panel-card" style="width: 100%; max-width: 440px; padding: 48px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+                <h3 style="font-size: 32px; font-weight: 900; letter-spacing: -2px;">Giriş</h3>
+                <button onclick="ui.closeModals()" style="font-size: 24px; opacity: 0.3;"><i class="ri-close-circle-line"></i></button>
             </div>
-
-            <form id="auth-form" class="flex flex-col gap-4">
-                <input type="email" id="auth-email" placeholder="E-poçt"
-                    class="p-4 bg-surface border border-border rounded-xl outline-none focus:border-accent transition-all font-medium">
-                <input type="password" id="auth-password" placeholder="Şifrə"
-                    class="p-4 bg-surface border border-border rounded-xl outline-none focus:border-accent transition-all font-medium">
-                <p id="auth-error" class="text-xs text-accent font-bold hidden"></p>
-                <button type="submit" class="btn-primary py-4 mt-2">Daxil Ol</button>
-                <div class="text-center mt-4">
-                    <button type="button" id="auth-switch"
-                        class="text-xs font-bold text-text-muted hover:text-accent">Hesabınız yoxdur? Qeydiyyat</button>
-                </div>
+            
+            <form id="auth-logic" style="display: flex; flex-direction: column; gap: 16px;">
+                <input type="email" placeholder="E-poçt" style="width: 100%; padding: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; outline: none; font-weight: 500;">
+                <input type="password" placeholder="Şifrə" style="width: 100%; padding: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; outline: none; font-weight: 500;">
+                <button type="submit" class="btn-main" style="padding: 20px; margin-top: 10px;">Daxil Ol</button>
             </form>
         </div>
     </div>
 
-    <!-- Global Cart Drawer Placeholder -->
-    <div id="cart-drawer" class="hidden"></div>
-    <div id="notif-container" class="fixed bottom-8 right-8 z-[10000] flex flex-col gap-4"></div>
-
-    <div id="loader">AZPIN-X</div>
+    <div id="notif-box" style="position: fixed; bottom: 40px; right: 40px; z-index: 9999; display: flex; flex-direction: column; gap: 12px;"></div>
 
     <script type="module" src="/src/main.js"></script>
 </body>
-
 </html>

@@ -1,152 +1,168 @@
 import './style.css'
 import { gsap } from 'gsap'
-import { initCart } from './cart'
-import { supabase } from './supabase'
+
+// --- Global State ---
+window.state = {
+    products: [],
+    categories: [],
+    user: null,
+    cart: [],
+    view: 'home'
+}
 
 const CONFIG = {
-    API_URL: '/api',
-    DEBOUNCE: 300
+    API_URL: '/api'
 }
 
-let db = []
-let initialized = false
+// --- Utilities ---
+const $ = (id) => document.getElementById(id)
+const $$ = (sel) => document.querySelectorAll(sel)
 
-const getElements = () => ({
-    html: document.documentElement,
-    appContent: document.getElementById('app-content'),
-    landingPage: document.getElementById('landing-page'),
-    userDashboard: document.getElementById('user-dashboard'),
-    out: document.getElementById('out'),
-    info: document.getElementById('count-info'),
-    chips: document.getElementById('cat-chips'),
-    authModal: document.getElementById('auth-modal'),
-    authForm: document.getElementById('auth-form'),
-    authTitle: document.getElementById('auth-title'),
-    authSwitch: document.getElementById('auth-switch'),
-    authClose: document.getElementById('auth-close'),
-    loginBtn: document.getElementById('login-btn'),
-    registerBtn: document.getElementById('register-btn'),
-    dashboardBtn: document.getElementById('dashboard-btn'),
-    logoutBtn: document.getElementById('logout-btn'),
-    authControls: document.getElementById('auth-controls'),
-    userControls: document.getElementById('user-controls'),
-    loader: document.getElementById('loader')
-})
+// --- Router ---
+window.router = {
+    go(view) {
+        state.view = view
+        $$('.view').forEach(v => v.classList.add('hidden'))
+        $(`view-${view}`).classList.remove('hidden')
+        window.scrollTo({ top: 0, behavior: 'instant' })
 
-const getIcon = (n) => {
-    const l = n.toLowerCase()
-    if (l.includes('script')) return 'ri-code-s-slash-line'
-    if (l.includes('perplexity')) return 'ri-search-eye-line'
-    if (l.includes('google')) return 'ri-google-fill'
-    if (l.includes('windows')) return 'ri-windows-fill'
-    if (l.includes('adobe')) return 'ri-artboard-line'
-    if (l.includes('spotify')) return 'ri-spotify-fill'
-    if (l.includes('netflix')) return 'ri-netflix-fill'
-    if (l.includes('tiktok')) return 'ri-tiktok-fill'
-    if (l.includes('steam')) return 'ri-steam-fill'
-    return 'ri-focus-3-line'
-}
-
-const getCategoryImage = (n) => {
-    const l = n.toLowerCase()
-    if (l.includes('pubg')) return 'https://epin.az/_ipx/w_96&f_webp/https://rest.epin.az/storage/categories/oPvP5Mm6qTioNEOktahxlFJh1xeX81G5SygIzbJM.jpg'
-    if (l.includes('free fire')) return 'https://epin.az/_ipx/w_96&f_webp/https://rest.epin.az/storage/categories/cITYHPhgFR7jTRbI5cT0QM5NDUGHEdSMz8OmjSPS.webp'
-    return null
-}
-
-function switchView(view) {
-    const el = getElements()
-    if (view === 'dashboard') {
-        el.landingPage.classList.add('hidden')
-        el.userDashboard.classList.remove('hidden')
-    } else {
-        el.landingPage.classList.remove('hidden')
-        el.userDashboard.classList.add('hidden')
-    }
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-}
-
-async function start() {
-    const el = getElements()
-    try {
-        const r = await fetch(`${CONFIG.API_URL}/products`)
-        const data = await r.json()
-        db = data.data?.products || []
-        
-        buildCategories()
-        if (el.loader) el.loader.style.display = 'none'
-        draw(1)
-    } catch (e) {
-        console.error("Fetch error:", e)
+        if (view === 'dashboard') ui.syncDashboard()
     }
 }
 
-function buildCategories() {
-    const el = getElements()
-    if (!el.chips) return
+// --- UI Logic ---
+window.ui = {
+    init() {
+        $('page-loader').style.display = 'none'
+        router.go('home')
+        this.bindEvents()
+        this.fetchData()
+    },
 
-    const cats = [...new Set(db.map(p => p.category_name))].filter(Boolean)
-    
-    cats.forEach(c => {
-        const chip = document.createElement('button')
-        chip.className = 'cat-chip'
-        const imgUrl = getCategoryImage(c)
-        const innerContent = imgUrl 
-            ? `<img src="${imgUrl}" class="w-full h-full object-cover">`
-            : `<i class="${getIcon(c)} text-xl text-text-muted"></i>`
+    bindEvents() {
+        $('auth-entry')?.addEventListener('click', () => {
+            $('auth-modal').style.display = 'flex'
+        })
+    },
 
-        chip.innerHTML = `
-            <div class="icon-box">${innerContent}</div>
-            <span class="notranslate">${c}</span>
-        `
-        chip.onclick = () => {
-            document.querySelectorAll('.cat-chip').forEach(ch => ch.classList.remove('active-chip'))
-            chip.classList.add('active-chip')
-            draw(1, c)
+    closeModals() {
+        $('auth-modal').style.display = 'none'
+    },
+
+    notify(text, type = 'accent') {
+        const box = $('notif-box')
+        const n = document.createElement('div')
+        n.style.padding = '20px 32px'
+        n.style.background = 'var(--bg)'
+        n.style.border = `2px solid var(--accent)`
+        n.style.borderRadius = '24px'
+        n.style.fontWeight = '800'
+        n.style.boxShadow = 'var(--shadow-lg)'
+        n.style.transform = 'translateY(20px)'
+        n.style.opacity = '0'
+        n.textContent = text
+        box.appendChild(n)
+
+        gsap.to(n, { opacity: 1, y: 0, duration: 0.4 })
+        setTimeout(() => {
+            gsap.to(n, { opacity: 0, y: 10, duration: 0.3, onComplete: () => n.remove() })
+        }, 3000)
+    },
+
+    async fetchData() {
+        try {
+            const r = await fetch(`${CONFIG.API_URL}/products`)
+            const d = await r.json()
+            state.products = d.data?.products || []
+            this.render()
+        } catch (e) {
+            this.notify("Məlumat yüklənmədi.")
         }
-        el.chips.appendChild(chip)
-    })
-}
+    },
 
-function draw(page = 1, category = 'all') {
-    const el = getElements()
-    if (!el.out) return
+    render() {
+        this.renderCategories()
+        this.renderProducts()
+    },
 
-    const filtered = db.filter(p => category === 'all' || p.category_name === category)
-    if (el.info) el.info.innerText = `${filtered.length} məhsul`
-    
-    el.out.innerHTML = ''
-    filtered.forEach(p => {
-        const card = document.createElement('div')
-        card.className = 'product-card'
-        const price = parseFloat(p.price || 0).toLocaleString('az-AZ', { minimumFractionDigits: 2 })
-        
-        card.innerHTML = `
-            <div class="product-image-wrapper">
-                <img src="${p.image || ''}" alt="${p.name}">
-            </div>
-            <div class="product-info">
-                <h3 class="notranslate">${p.name}</h3>
-                <div class="price-container">
-                    <span class="current-price">${price} ₼</span>
+    renderCategories() {
+        const wrap = $('discovery-chips')
+        if (!wrap) return
+
+        const cats = [...new Set(state.products.map(p => p.category_name))].filter(Boolean)
+
+        cats.forEach(c => {
+            const btn = document.createElement('button')
+            btn.className = 'cat-item'
+            btn.innerHTML = `
+                <div class="cat-icon-box"><i class="${this.getIcon(c)} text-2xl"></i></div>
+                <span class="notranslate">${c}</span>
+            `
+            btn.onclick = () => {
+                $$('.cat-item').forEach(i => i.classList.remove('active'))
+                btn.classList.add('active')
+                this.renderProducts(c)
+            }
+            wrap.appendChild(btn)
+        })
+    },
+
+    renderProducts(filter = 'all') {
+        const out = $('product-out')
+        if (!out) return
+
+        const filtered = state.products.filter(p => filter === 'all' || p.category_name === filter)
+        out.innerHTML = ''
+
+        filtered.forEach((p, i) => {
+            const card = document.createElement('div')
+            card.className = 'item-card fadeIn'
+            card.style.animationDelay = `${i * 0.05}s`
+            const price = parseFloat(p.price || 0).toLocaleString('az-AZ', { minimumFractionDigits: 2 })
+
+            card.innerHTML = `
+                <div class="item-media">
+                    <img src="${p.image || ''}" alt="${p.name}">
                 </div>
-            </div>
-            <button onclick="addToCart('${p.id}')" class="btn-primary mt-6 w-full">Səbətə At</button>
-        `
-        el.out.appendChild(card)
-    })
+                <h3 class="item-name notranslate">${p.name}</h3>
+                <div class="item-meta">
+                    <span class="price-tag">${price} ₼</span>
+                    <button onclick="shop.add('${p.id}')" class="btn-main" style="padding: 12px 20px;"><i class="ri-add-line"></i></button>
+                </div>
+            `
+            out.appendChild(card)
+        })
+    },
+
+    getIcon(n) {
+        const l = n.toLowerCase()
+        if (l.includes('pubg')) return 'ri-gamepad-line'
+        if (l.includes('gift')) return 'ri-gift-line'
+        if (l.includes('steam')) return 'ri-steam-fill'
+        if (l.includes('netflix')) return 'ri-netflix-fill'
+        if (l.includes('spotify')) return 'ri-spotify-fill'
+        return 'ri-focus-3-line'
+    },
+
+    syncDashboard() {
+        if (!state.user) {
+            router.go('home')
+            this.notify("Giriş etməlisiniz.")
+            $('auth-modal').style.display = 'flex'
+        }
+    }
 }
 
-function init() {
-    if (initialized) return
-    initialized = true
-    initCart();
-    
-    const el = getElements()
-    el.loginBtn?.addEventListener('click', () => switchView('dashboard')) // Temp mock
-    el.dashboardBtn?.addEventListener('click', () => switchView('dashboard'))
-    
-    start()
+// --- Shop Logic ---
+window.shop = {
+    add(id) {
+        const p = state.products.find(x => String(x.id) === String(id))
+        if (!p) return
+        state.cart.push(p)
+        $('bag-count').textContent = state.cart.length
+        ui.notify(`${p.name} səbətə əlavə edildi.`)
+    }
 }
 
-document.addEventListener('DOMContentLoaded', init)
+// --- Init ---
+document.addEventListener('DOMContentLoaded', () => ui.init())
