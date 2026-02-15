@@ -18,17 +18,20 @@ const pool = mysql.createPool({
 });
 
 async function initDB() {
+    console.log('Starting database initialization check...');
     try {
         const schemaPath = path.join(__dirname, '..', 'schema.sql');
+        console.log(`Looking for schema at: ${schemaPath}`);
         if (fs.existsSync(schemaPath)) {
             const schema = fs.readFileSync(schemaPath, 'utf8');
             await pool.query(schema);
-            console.log('Database initialized successfully');
+            console.log('✅ Database schema applied successfully');
         } else {
-            console.warn('schema.sql not found, skipping auto-init');
+            console.error('❌ CRITICAL: schema.sql NOT FOUND at', schemaPath);
+            console.warn('Database tables might be missing!');
         }
     } catch (err) {
-        console.error('Database initialization failed:', err);
+        console.error('❌ Database initialization FAILED:', err.message);
     }
 }
 

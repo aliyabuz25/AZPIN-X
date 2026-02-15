@@ -10,6 +10,7 @@ RUN npm install
 
 # Server dosyalarını kopyala
 COPY server ./server
+COPY schema.sql ./
 COPY .env* ./
 
 # Port ve Env
