@@ -71,5 +71,20 @@ npm run dev:all  # Hem frontend hem backend'i aynı anda başlatır
 Backend: `http://localhost:5174`
 Frontend: `http://localhost:5173`
 
----
-**Not:** Backend API çağrıları frontend tarafından `/api` path'i üzerinden yapılır. Production ortamında Nginx bu çağrıları internal olarak backend sunucusuna (`azpin-backend`) iletir. Local ortamda `vite.config.js` proxy ayarları bu yönlendirmeyi simüle eder.
+### 7. Son Sənədləşdirmə və Deployment (Xülasə)
+Projenin MySQL və Traefik ilə düzgün işləməsi üçün bu addımları izləyin:
+
+1. **GitHub-dan ən son kodu çəkin:**
+   ```bash
+   cd /datastore/azpin/app
+   git pull origin main
+   ```
+2. **Konteynerləri build edin:**
+   ```bash
+   docker build -t azpin-backend:latest -f Dockerfile.backend .
+   docker build -t azpin-frontend:latest -f Dockerfile.frontend .
+   ```
+3. **Portainer Stack-i yeniləyin:**
+   `portainer-stack.yml` faylını Portainer-ə kopyalayın və lazım olan Environment Variables (JWT_SECRET, DB_PASSWORD və s.) təyin edin. `Update the stack` düyməsinə basın.
+
+Bütün sistem (Database, Auth, Frontend, Traefik) avtomatik qurulacaq və işləyəcək.
