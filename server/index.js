@@ -6,7 +6,7 @@ import fs from 'fs'
 import { fileURLToPath } from 'url'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import { v4 as uuidv4 } from 'uuid'
+import { uuid as uuidv4 } from 'uuidv4'
 import pool, { initDB } from './db.js'
 
 const app = express()
@@ -49,25 +49,30 @@ const authenticateToken = (req, res, next) => {
 // Auth Endpoints
 app.post('/api/auth/register', async (req, res) => {
     const { email, password } = req.body
+    console.log(`Registration attempt for: ${email}`)
     if (!email || !password) return res.status(400).json({ error: 'Email and password required' })
 
     try {
         const hashedPassword = await bcrypt.hash(password, 10)
         const id = uuidv4()
+        console.log(`Generated ID: ${id}`)
 
         await pool.query(
             'INSERT INTO users (id, email, password_hash) VALUES (?, ?, ?)',
             [id, email, hashedPassword]
         )
+        console.log('User inserted successfully')
 
         await pool.query(
             'INSERT INTO profiles (user_id, first_name, last_name, phone, avatar_url) VALUES (?, ?, ?, ?, ?)',
             [id, '', '', '', '']
         )
+        console.log('Profile created successfully')
 
         const token = jwt.sign({ id, email }, JWT_SECRET, { expiresIn: '7d' })
         res.json({ token, user: { id, email } })
     } catch (e) {
+        console.error('Registration error:', e)
         if (e.code === 'ER_DUP_ENTRY') return res.status(400).json({ error: 'Email already exists' })
         res.status(500).json({ error: e.message })
     }
