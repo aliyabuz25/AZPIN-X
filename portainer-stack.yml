@@ -1,4 +1,18 @@
 services:
+  azpin-db:
+    image: mysql:8.0
+    container_name: azpin-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: azpin_db
+      MYSQL_USER: azpin_user
+      MYSQL_PASSWORD: azpin_pass
+      MYSQL_ROOT_PASSWORD: azpin_root_pass
+    volumes:
+      - /datastore/azpin/mysql:/var/lib/mysql
+    networks:
+      - internal
+
   azpin-backend:
     build:
       context: .
@@ -6,41 +20,46 @@ services:
     image: azpin-backend:latest
     container_name: azpin-backend
     restart: unless-stopped
+    depends_on:
+      - azpin-db
     environment:
       PORT: "5174"
-      SUPABASE_URL: "https://qmrchngwatxrnnkklfwa.supabase.co"
-      SUPABASE_ANON_KEY: "sb_publishable_FHdYeBLA59RTUx1SVtbBrQ__L35Ax02"
-      SUPABASE_SERVICE_ROLE_KEY: "sb_publishable_FHdYeBLA59RTUx1SVtbBrQ__L35Ax02"
+      DB_HOST: azpin-db
+      DB_USER: azpin_user
+      DB_PASSWORD: azpin_pass
+      DB_NAME: azpin_db
+      JWT_SECRET: "azpin-super-secret-key"
       HUBMSG_API_KEY: "API-KEY-XXXX"
     volumes:
       - /datastore/azpin/uploads:/app/public/uploads
-    networks:
-      - internal
-
-  azpin-frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile.frontend
-      args:
-        VITE_SUPABASE_URL: "https://qmrchngwatxrnnkklfwa.supabase.co"
-        VITE_SUPABASE_ANON_KEY: "sb_publishable_FHdYeBLA59RTUx1SVtbBrQ__L35Ax02"
-    image: azpin-frontend:latest
-    container_name: azpin-frontend
-    restart: unless-stopped
-    environment:
-      VITE_SUPABASE_URL: "https://qmrchngwatxrnnkklfwa.supabase.co"
-      VITE_SUPABASE_ANON_KEY: "sb_publishable_FHdYeBLA59RTUx1SVtbBrQ__L35Ax02"
-    volumes:
-      - /datastore/azpin/nginx-logs:/app/nginx-logs
     networks:
       - internal
       - edge
     labels:
       - 'traefik.enable=true'
       - 'traefik.docker.network=edge'
-      - 'traefik.http.routers.azpin.rule=Host(`azpinx.com`) || Host(`azpinx.octotech.az`)'
+      - 'traefik.http.routers.azpin-api.rule=(Host(`azpinx.com`) || Host(`azpinx.octotech.az`)) && PathPrefix(`/api`)'
+      - 'traefik.http.routers.azpin-api.entrypoints=web'
+      - 'traefik.http.services.azpin-api.loadbalancer.server.port=5174'
+
+  azpin-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    image: azpin-frontend:latest
+    container_name: azpin-frontend
+    restart: unless-stopped
+    networks:
+      - internal
+      - edge
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.docker.network=edge'
+      - 'traefik.http.routers.azpin.rule=(Host(`azpinx.com`) || Host(`azpinx.octotech.az`)) && !PathPrefix(`/api`)'
       - 'traefik.http.routers.azpin.entrypoints=web'
       - 'traefik.http.services.azpin.loadbalancer.server.port=80'
+    volumes:
+      - /datastore/azpin/nginx-logs:/app/nginx-logs
 
 networks:
   edge:

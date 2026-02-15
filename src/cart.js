@@ -135,33 +135,23 @@ export const CartManager = {
         if (this.items.length === 0) return
         const total = this.getTotal()
         const orderItems = this.items.map(i => ({
-            product_id: i.id,
+            id: i.id,
             name: i.name,
             price: i.price,
-            quantity: i.quantity,
-            total: i.price * i.quantity
+            quantity: i.quantity
         }))
 
         const { data: order, error } = await supabase
             .from('orders')
             .insert({
-                user_id: data.user.id,
-                status: 'pending_payment',
-                payment_method: 'c2c',
                 total,
-                currency: 'AZN'
+                items: orderItems
             })
-            .select()
-            .single()
 
         if (error) {
             this.notify('Sifariş yaradılmadı.')
             return
         }
-
-        await supabase.from('order_items').insert(
-            orderItems.map(i => ({ ...i, order_id: order.id }))
-        )
 
         const localOrders = JSON.parse(localStorage.getItem('orders_local') || '[]')
         localOrders.unshift({
