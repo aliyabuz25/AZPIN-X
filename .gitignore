@@ -1,5 +1,7 @@
-node_modules
+.vite
+*.log
 dist
+node_modules
 .env
 .env.local
 .env.*.local
