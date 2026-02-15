@@ -4,782 +4,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AZPIN-X | Premium E-Pin Store</title>
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>AZPIN-X | Premium Digital Store</title>
+    <!-- Icons & Fonts -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <!-- Main Style -->
 </head>
 
-<body class="bg-bg text-text min-h-screen">
-    <!-- Page Transition Overlay -->
-    <div class="page-transition active"
-        style="position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; background: #fcfcfd;">
-        <div class="transition-logo">AZPIN<span class="text-accent">-X</span></div>
-    </div>
-    <canvas id="snow-canvas" style="position: fixed; inset: 0; pointer-events: none; z-index: 1000;"></canvas>
+<body>
+    <!-- Top Progress Line -->
+    <div id="top-line" class="fixed top-0 left-0 w-full h-1 bg-accent z-[9999]"></div>
 
-    <!-- Cart Modal -->
-    <div id="cart-drawer"
-        class="fixed inset-0 bg-black/40 hidden flex items-center justify-center z-[10000] sm:p-4 transform transition-all">
-        <div
-            class="w-full sm:max-w-[560px] bg-white text-black shadow-2xl border-x-0 sm:border border-border rounded-t-2xl sm:rounded-2xl flex flex-col h-full sm:h-auto sm:max-h-[90vh] overflow-hidden absolute bottom-0 sm:relative">
-            <div class="p-6 border-b border-border flex items-center justify-between">
-                <h2 class="text-lg font-black uppercase text-text">Səbətim</h2>
-                <button
-                    class="cart-toggle w-10 h-10 rounded-xl hover:bg-zinc-100 transition-colors flex items-center justify-center">
-                    <i class="ri-close-line text-2xl"></i>
+    <!-- Main Navigation -->
+    <header>
+        <nav class="nav-container">
+            <div class="flex items-center gap-8">
+                <a href="/" class="text-2xl font-[900] tracking-tighter uppercase notranslate">AZPIN<span
+                        class="text-accent">-X</span></a>
+            </div>
+
+            <div class="flex items-center gap-6">
+                <button id="search-toggle" class="p-2 text-text-muted hover:text-accent transition-colors"><i
+                        class="ri-search-2-line text-xl"></i></button>
+                <div id="auth-controls" class="flex items-center gap-4">
+                    <button id="login-btn" class="font-bold text-sm hover:text-accent transition-colors">Daxil
+                        Ol</button>
+                    <button id="register-btn" class="btn-primary text-sm px-6">Qeydiyyat</button>
+                </div>
+                <div id="user-controls" class="hidden flex items-center gap-4">
+                    <button id="dashboard-btn"
+                        class="font-bold text-sm hover:text-accent transition-colors">Panel</button>
+                    <button id="logout-btn" class="p-2 text-text-muted hover:text-accent"><i
+                            class="ri-logout-box-r-line"></i></button>
+                </div>
+                <button id="cart-btn"
+                    class="relative p-2 bg-surface rounded-xl border border-border hover:border-accent group transition-all">
+                    <i class="ri-shopping-cart-2-line text-xl group-hover:text-accent"></i>
+                    <span id="cart-count"
+                        class="absolute -top-1 -right-1 w-5 h-5 bg-accent text-white text-[10px] font-black rounded-full flex items-center justify-center">0</span>
                 </button>
             </div>
-            <div id="cart-items" class="flex-1 overflow-y-auto scrollbar-hide">
-                <!-- Items injected by JS -->
-            </div>
-            <div class="p-6 border-t border-border bg-zinc-50 space-y-5">
-                <div class="grid grid-cols-2 gap-3">
-                    <input type="text" placeholder="Ad"
-                        class="w-full px-4 py-3 rounded-xl border border-border bg-white text-sm font-medium outline-none focus:border-accent/40">
-                    <input type="text" placeholder="Soyad"
-                        class="w-full px-4 py-3 rounded-xl border border-border bg-white text-sm font-medium outline-none focus:border-accent/40">
-                </div>
-                <input type="text" placeholder="Alıcı Adresi"
-                    class="w-full px-4 py-3 rounded-xl border border-border bg-white text-sm font-medium outline-none focus:border-accent/40">
-                <input type="text" placeholder="GSM nömrəsi"
-                    class="w-full px-4 py-3 rounded-xl border border-border bg-white text-sm font-medium outline-none focus:border-accent/40">
-
-                <div class="space-y-2">
-                    <p class="text-[11px] font-black uppercase tracking-widest text-text-muted">Ödəniş tipi</p>
-                    <div class="grid grid-cols-3 gap-2 text-[11px] font-black uppercase tracking-wide">
-                        <label
-                            class="flex items-center gap-2 px-3 py-2 border border-accent text-accent rounded-lg bg-accent/5">
-                            <input type="radio" name="payment" class="accent-accent" checked>
-                            C2C
-                        </label>
-                        <label
-                            class="flex items-center gap-2 px-3 py-2 border border-border text-text-muted rounded-lg opacity-50 cursor-not-allowed">
-                            <input type="radio" name="payment" disabled>
-                            Bank Transferi
-                        </label>
-                        <label
-                            class="flex items-center gap-2 px-3 py-2 border border-border text-text-muted rounded-lg opacity-50 cursor-not-allowed">
-                            <input type="radio" name="payment" disabled>
-                            Kredi Kartı
-                        </label>
-                    </div>
-                </div>
-
-                <div class="space-y-3 bg-zinc-100 p-4 rounded-xl border border-border">
-                    <p class="text-[10px] font-black uppercase tracking-widest text-text-muted text-center mb-2">Ödəniş
-                        Məlumatları (C2C)</p>
-
-                    <div>
-                        <p class="text-[9px] font-bold text-zinc-500 uppercase tracking-wide mb-1">Kart Sahibi</p>
-                        <input type="text" value="Kanan Aliyev" readonly
-                            class="w-full px-3 py-2 rounded-lg border border-border bg-white text-xs font-black uppercase text-zinc-800 outline-none">
-                    </div>
-
-                    <div>
-                        <p class="text-[9px] font-bold text-zinc-500 uppercase tracking-wide mb-1">Bank</p>
-                        <input type="text" value="M10 / Kapital Bank" readonly
-                            class="w-full px-3 py-2 rounded-lg border border-border bg-white text-xs font-black uppercase text-zinc-800 outline-none">
-                    </div>
-
-                    <div>
-                        <p class="text-[9px] font-bold text-zinc-500 uppercase tracking-wide mb-1">Kart Nömrəsi</p>
-                        <div class="relative">
-                            <input type="text" value="4169 7388 1463 4337" readonly
-                                class="w-full px-3 py-2 rounded-lg border border-border bg-white text-sm font-black tracking-widest text-zinc-900 outline-none font-mono">
-                            <button
-                                class="absolute right-2 top-1/2 -translate-y-1/2 text-accent hover:text-accent/80 text-xs font-bold uppercase transition-colors"
-                                onclick="navigator.clipboard.writeText('4169738814634337'); this.innerText='Kopyalandı!'; setTimeout(()=>this.innerText='Kopyala', 1500)">
-                                Kopyala
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <label class="flex items-start gap-3 text-xs font-bold text-text-muted">
-                    <input type="checkbox" class="mt-1 accent-accent">
-                    Hökum şərtlərini və istifadə qaydalarını qəbul edirəm.
-                </label>
-
-                <div
-                    class="flex items-center justify-between text-sm font-black uppercase tracking-widest text-text-muted">
-                    <span>Cəmi:</span>
-                    <span id="cart-subtotal" class="text-accent text-lg">0.00 ₼</span>
-                </div>
-                <button id="checkout-btn"
-                    class="w-full py-5 bg-accent text-white font-black rounded-2xl shadow-xl shadow-accent/20 hover:brightness-110 active:scale-95 transition-all uppercase tracking-widest text-xs">
-                    Sifarişi Tamamla
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Promo Banner -->
-    <div class="bg-gradient-to-r from-zinc-800 to-zinc-950 py-2.5 text-white overflow-hidden relative">
-        <div
-            class="max-w-[1400px] mx-auto px-5 md:px-10 flex justify-center items-center gap-6 text-[11px] font-black tracking-widest uppercase">
-            <span class="flex items-center gap-2 opacity-80"><i class="ri-shield-check-line text-green-400"></i> %100
-                Güvənli Alış-veriş</span>
-            <span class="w-1.5 h-1.5 rounded-full bg-white/20"></span>
-            <span class="flex items-center gap-2">Sürətli Təslimat <i
-                    class="ri-flashlight-line text-yellow-400"></i></span>
-        </div>
-    </div>
-
-    <!-- Top Info Bar -->
-    <div class="bg-surface border-b border-border/50 py-2 hidden sm:block overflow-hidden">
-        <div class="max-w-[1400px] mx-auto px-5 md:px-10 flex justify-between items-center relative">
-            <div
-                class="flex items-center gap-10 text-[10px] font-bold text-text-muted uppercase tracking-widest shrink-0">
-                <a href="#" class="hover:text-accent transition-colors">Haqqımızda</a>
-                <a href="#" class="hover:text-accent transition-colors">Blog</a>
-                <a href="#" class="hover:text-accent transition-colors">Dəstək</a>
-            </div>
-
-            <!-- Icon Marquee -->
-            <div class="flex-1 nav-marquee-container overflow-hidden px-10">
-                <div class="marquee-content text-text-muted/30 text-lg">
-                    <i class="ri-gamepad-line"></i>
-                    <i class="ri-playstation-fill"></i>
-                    <i class="ri-xbox-fill"></i>
-                    <i class="ri-steam-fill"></i>
-                    <i class="ri-nintendo-switch-fill"></i>
-                    <i class="ri-mouse-line"></i>
-                    <i class="ri-headphone-line"></i>
-                    <!-- Duplicate for loop -->
-                    <i class="ri-gamepad-line"></i>
-                    <i class="ri-playstation-fill"></i>
-                    <i class="ri-xbox-fill"></i>
-                    <i class="ri-steam-fill"></i>
-                    <i class="ri-nintendo-switch-fill"></i>
-                    <i class="ri-mouse-line"></i>
-                    <i class="ri-headphone-line"></i>
-                </div>
-            </div>
-
-            <div
-                class="flex items-center gap-3 text-[10px] font-bold text-text-muted uppercase tracking-widest shrink-0">
-                <i class="ri-earth-line text-xs text-zinc-400"></i>
-                <div class="gtranslate_wrapper"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Header -->
-    <header class="bg-header-bg backdrop-blur-xl sticky top-0 z-[100] border-b border-border py-4 transition-all"
-        id="main-header">
-        <div class="max-w-[1400px] mx-auto px-5 md:px-10 flex items-center gap-8 sm:gap-12">
-            <!-- Logo area -->
-            <a href="/" class="flex flex-col shrink-0 notranslate">
-                <span class="text-3xl font-black tracking-tighter text-text">AZPIN<span
-                        class="text-accent">-X</span></span>
-                <span class="text-[9px] font-bold text-text-muted -mt-1 tracking-[0.2em] uppercase">The Ultimate Gaming
-                    Hub</span>
-            </a>
-
-            <!-- Search Area -->
-            <div class="flex-1 hidden md:block">
-                <div
-                    class="search-light flex items-center bg-white border border-zinc-200 rounded-2xl overflow-hidden focus-within:bg-white focus-within:border-accent/30 focus-within:shadow-xl focus-within:shadow-accent/5 transition-all group">
-                    <div
-                        class="px-6 py-3.5 border-r border-border/10 flex items-center gap-2 text-[11px] font-black text-zinc-500 uppercase cursor-pointer hover:bg-zinc-200 transition-colors">
-                        Kategoriyalar <i class="ri-arrow-down-s-line"></i>
-                    </div>
-                    <input type="text" id="find" placeholder="Oyun, kod və ya məhsul axtar..."
-                        class="flex-1 bg-transparent px-6 py-3.5 text-sm font-medium text-zinc-900 outline-none placeholder:text-zinc-400 search-light">
-                    <div class="px-6 text-zinc-400 group-focus-within:text-accent transition-colors">
-                        <i class="ri-search-2-line text-lg"></i>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Header Actions -->
-            <div class="flex items-center gap-3 sm:gap-6 ml-auto">
-                <button
-                    class="cart-toggle relative w-11 h-11 flex items-center justify-center rounded-xl hover:bg-zinc-100  transition-colors group">
-                    <i class="ri-shopping-cart-2-line text-xl group-hover:text-accent transition-colors"></i>
-                    <span
-                        class="cart-count absolute top-1.5 right-1.5 w-4 h-4 bg-accent text-white text-[9px] items-center justify-center rounded-full font-black hidden">0</span>
-                </button>
-
-                <div class="hidden sm:flex items-center gap-3">
-                    <a href="#" id="login-btn"
-                        class="px-6 py-3 rounded-xl text-sm font-black hover:bg-zinc-100 transition-colors inline-flex items-center gap-2">
-                        <i class="ri-login-circle-line text-base"></i>
-                        Giriş
-                    </a>
-                    <a href="#" id="register-btn"
-                        class="px-7 py-3 rounded-xl bg-accent text-white text-sm font-black shadow-lg shadow-accent/20 hover:brightness-110 active:scale-95 transition-all inline-flex items-center gap-2">
-                        <i class="ri-user-add-line text-base"></i>
-                        Qeydiyyat
-                    </a>
-                    <div id="user-menu" class="relative hidden">
-                        <button id="user-menu-btn"
-                            class="px-5 py-3 border border-border text-sm font-black inline-flex items-center gap-2">
-                            <i class="ri-user-3-line text-base"></i>
-                            <span id="user-name" class="max-w-[140px] truncate">Hesab</span>
-                            <i class="ri-arrow-down-s-line text-base opacity-60"></i>
-                        </button>
-                        <div id="user-menu-dropdown"
-                            class="absolute right-0 mt-2 w-56 bg-surface border border-border shadow-2xl hidden overflow-hidden rounded-xl animate-in">
-                            <div id="user-balance-item"
-                                class="px-4 py-4 bg-accent/5 border-b border-border flex items-center justify-between">
-                                <span
-                                    class="text-[10px] font-black uppercase tracking-widest text-text-muted">Balans</span>
-                                <div class="flex items-center gap-2">
-                                    <span id="header-balance" class="text-sm font-black text-accent">0.00 ₼</span>
-                                    <i class="ri-wallet-3-line text-accent"></i>
-                                </div>
-                            </div>
-                            <button id="profile-btn"
-                                class="w-full text-left px-4 py-3 text-xs font-black uppercase tracking-widest hover:bg-zinc-100 inline-flex items-center gap-2">
-                                <i class="ri-user-settings-line text-base"></i>
-                                Profil Ayarları
-                            </button>
-                            <button id="orders-btn"
-                                class="w-full text-left px-4 py-3 text-xs font-black uppercase tracking-widest hover:bg-zinc-100 inline-flex items-center gap-2">
-                                <i class="ri-file-list-3-line text-base"></i>
-                                Sifarişlərim
-                            </button>
-                            <button id="logout-btn"
-                                class="w-full text-left px-4 py-3 text-xs font-black uppercase tracking-widest hover:bg-zinc-100 inline-flex items-center gap-2">
-                                <i class="ri-logout-circle-line text-base"></i>
-                                Çıxış et
-                            </button>
-                            <a href="mailto:support@azpin-x.com"
-                                class="block px-4 py-3 text-xs font-black uppercase tracking-widest hover:bg-zinc-100 inline-flex items-center gap-2">
-                                <i class="ri-alert-line text-base"></i>
-                                Sorun Bildir
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <button id="thm-btn"
-                    class="w-11 h-11 flex items-center justify-center rounded-xl border border-border hover:border-accent/30 transition-all">
-                    <i class="ri-moon-line text-xl"></i>
-                </button>
-
-                <button id="mobile-menu-btn"
-                    class="md:hidden w-11 h-11 flex items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 transition-colors">
-                    <i class="ri-menu-4-line text-xl"></i>
-                </button>
-            </div>
-        </div>
+        </nav>
     </header>
 
-    <!-- Mobile Menu Drawer -->
-    <div id="mobile-menu" class="fixed inset-0 bg-white hidden z-[9999] flex flex-col animate-in-active">
-        <div class="w-full h-full flex flex-col p-6">
-            <div class="flex items-center justify-between mb-8">
-                <span class="text-2xl font-black tracking-tighter text-text">AZPIN<span
-                        class="text-accent">-X</span></span>
-                <button id="mobile-menu-close"
-                    class="w-12 h-12 flex items-center justify-center bg-zinc-100 hover:bg-zinc-200 rounded-full transition-colors">
-                    <i class="ri-close-line text-3xl"></i>
-                </button>
-            </div>
-
-            <div class="space-y-6 flex-1 overflow-y-auto">
-                <!-- Mobile Search -->
-                <div class="relative">
-                    <i class="ri-search-2-line absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400"></i>
-                    <input type="text" id="mobile-search" placeholder="Axtar..."
-                        class="w-full pl-10 pr-4 py-3 bg-zinc-100 border-none rounded-xl text-sm font-medium focus:ring-1 focus:ring-accent outline-none">
-                </div>
-
-                <!-- Mobile Auth Buttons (if not logged in) -->
-                <div id="mobile-auth-buttons" class="grid grid-cols-2 gap-3">
-                    <button
-                        class="mobile-login-btn w-full py-3 rounded-xl border border-border text-sm font-black hover:bg-zinc-100 transition-colors">
-                        Giriş
-                    </button>
-                    <button
-                        class="mobile-register-btn w-full py-3 rounded-xl bg-accent text-white text-sm font-black shadow-lg shadow-accent/20 hover:brightness-110">
-                        Qeydiyyat
-                    </button>
-                </div>
-
-                <!-- Mobile User Section (if logged in) -->
-                <div id="mobile-user-section" class="hidden space-y-3">
-                    <div class="p-4 bg-zinc-50 border border-border rounded-xl flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-10 h-10 bg-accent/10 rounded-full flex items-center justify-center text-accent">
-                                <i class="ri-user-smile-line text-xl"></i>
-                            </div>
-                            <div>
-                                <p id="mobile-user-name" class="text-sm font-black text-text">İstifadəçi</p>
-                                <p class="text-[10px] text-text-muted font-bold">Xoş gəldiniz</p>
-                            </div>
+    <main id="app-content">
+        <!-- Landing Section -->
+        <section id="landing-page">
+            <!-- Simplified Hero -->
+            <div class="relative w-full h-[400px] bg-surface flex items-center justify-center overflow-hidden">
+                <div class="max-w-[1280px] w-full px-6 flex items-center justify-between z-10">
+                    <div class="max-w-xl">
+                        <span class="text-accent font-black text-[10px] tracking-[0.3em] uppercase block mb-4">Yeni
+                            Gələnlər</span>
+                        <h1 class="text-5xl md:text-7xl font-[900] tracking-tighter leading-[0.9] mb-6 uppercase">
+                            Premium Oyun <br> & Rəqəmsal Kodlar</h1>
+                        <p class="text-text-muted font-medium text-sm mb-8 max-w-sm">Saniyələr içində təslimat, 24/7
+                            aktiv dəstək və ən ucuz qiymətlər.</p>
+                        <div class="flex gap-4">
+                            <button class="btn-primary">İndi Al</button>
+                            <button
+                                class="px-8 py-3 font-bold text-sm rounded-xl border border-border hover:bg-white transition-all">Kampaniyalar</button>
                         </div>
                     </div>
-                    <button
-                        class="mobile-profile-btn w-full py-3 px-4 rounded-xl border border-border text-left text-sm font-bold flex items-center gap-3 hover:bg-zinc-100 transition-colors">
-                        <i class="ri-user-settings-line text-lg text-text-muted"></i> Profil Ayarları
-                    </button>
-                    <button
-                        class="mobile-orders-btn w-full py-3 px-4 rounded-xl border border-border text-left text-sm font-bold flex items-center gap-3 hover:bg-zinc-100 transition-colors">
-                        <i class="ri-file-list-3-line text-lg text-text-muted"></i> Sifarişlərim
-                    </button>
-                    <button
-                        class="mobile-logout-btn w-full py-3 px-4 rounded-xl border border-red-100 bg-red-50 text-red-600 text-left text-sm font-black flex items-center gap-3 hover:bg-red-100 transition-colors">
-                        <i class="ri-logout-box-line text-lg"></i> Hesabdan Çıx
-                    </button>
                 </div>
-
-                <!-- Navigation Links -->
-                <nav class="space-y-2">
-                    <a href="/"
-                        class="block px-4 py-3 rounded-xl hover:bg-zinc-100 text-sm font-bold text-text-muted hover:text-text transition-colors flex items-center gap-3">
-                        <i class="ri-home-4-line text-lg"></i> Ana Səhifə
-                    </a>
-                    <a href="/products.html"
-                        class="block px-4 py-3 rounded-xl hover:bg-zinc-100 text-sm font-bold text-text-muted hover:text-text transition-colors flex items-center gap-3">
-                        <i class="ri-store-2-line text-lg"></i> Mağaza
-                    </a>
-                    <a href="/catalog.html"
-                        class="block px-4 py-3 rounded-xl hover:bg-zinc-100 text-sm font-bold text-text-muted hover:text-text transition-colors flex items-center gap-3">
-                        <i class="ri-apps-2-line text-lg"></i> Kataloq
-                    </a>
-                    <a href="/about.html"
-                        class="block px-4 py-3 rounded-xl hover:bg-zinc-100 text-sm font-bold text-text-muted hover:text-text transition-colors flex items-center gap-3">
-                        <i class="ri-team-line text-lg"></i> Haqqımızda
-                    </a>
-                    <a href="/contact.html"
-                        class="block px-4 py-3 rounded-xl hover:bg-zinc-100 text-sm font-bold text-text-muted hover:text-text transition-colors flex items-center gap-3">
-                        <i class="ri-customer-service-2-line text-lg"></i> Əlaqə
-                    </a>
-                </nav>
-            </div>
-
-            <div class="mt-auto pt-6 border-t border-border">
-                <p class="text-xs text-center text-text-muted font-bold">&copy; 2026 AZPIN-X</p>
-            </div>
-        </div>
-    </div>
-
-    <main class="max-w-[1400px] mx-auto px-5 md:px-10 py-10">
-        <!-- Hero Section -->
-        <section id="hero-section"
-            class="rounded-[2.5rem] overflow-hidden bg-zinc-900 relative h-[450px] shadow-2xl mt-4">
-            <div id="slider" class="flex h-full"></div>
-            </div>
-            </div>
-            <div class="min-w-full w-full h-full relative shrink-0 slide" data-color="#ffb000">
-                <img src="https://cdn2.steamgriddb.com/hero/aa998495a109860f4e3573229b48c6f3.webp"
-                    class="w-full h-full object-cover">
-                <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/30 to-transparent"></div>
+                <!-- Background Decoration -->
                 <div
-                    class="absolute inset-x-0 bottom-0 top-0 flex flex-col justify-center px-12 md:px-20 text-white max-w-2xl">
-                    <span class="text-accent font-black tracking-widest text-xs uppercase mb-4 block">Limited
-                        Offer</span>
-                    <h2 class="text-4xl md:text-5xl font-black mb-6 tracking-tighter leading-tight italic">PUBG
-                        <br>MOBILE UC
-                    </h2>
-                    <p class="text-base text-zinc-300 mb-8 leading-relaxed max-w-md">En uygun fiyatlarla UC yükle,
-                        Royale
-                        Pass'te farkını ortaya koy. Saniyeler içinde teslimat!</p>
-                    <div class="flex gap-4">
-                        <a href="#"
-                            class="px-8 py-4 bg-accent rounded-2xl font-black text-xs uppercase tracking-wider hover:scale-105 transition-all shadow-xl shadow-accent/30">UC
-                            Satın Al</a>
-                        <a href="#"
-                            class="px-8 py-4 bg-white/10 backdrop-blur-md rounded-2xl font-black text-xs uppercase tracking-wider hover:bg-white/20 transition-all border border-white/10">Detallı
-                            Bax</a>
+                    class="absolute -right-20 top-0 w-1/2 h-full bg-gradient-to-l from-accent/5 to-transparent skew-x-[-20deg]">
+                </div>
+            </div>
+
+            <!-- Category Discovery -->
+            <div class="category-discovery">
+                <div class="max-w-[1280px] mx-auto px-6">
+                    <h2 class="text-[10px] font-black uppercase tracking-[0.3em] text-text-muted opacity-50 mb-6">
+                        Kategoriyalar</h2>
+                </div>
+                <div id="cat-chips" class="scrollbar-hide">
+                    <button id="chip-all" class="cat-chip active-chip">
+                        <div class="icon-box"><i class="ri-apps-2-line text-xl"></i></div>
+                        <span>Hamısı</span>
+                    </button>
+                    <!-- Dynamically injected -->
+                </div>
+            </div>
+
+            <!-- Product Display -->
+            <div class="max-w-[1280px] mx-auto px-6 py-12">
+                <div class="flex items-center justify-between mb-12">
+                    <div>
+                        <h2 class="text-2xl font-black tracking-tight">Məhsullar</h2>
+                        <p id="count-info" class="text-xs text-text-muted font-bold mt-1">Yüklənir...</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <select id="sort-select"
+                            class="px-4 py-2 bg-surface border border-border rounded-xl text-xs font-bold outline-none">
+                            <option value="new">Ən Yenilər</option>
+                            <option value="price-asc">Ucuzdan Bahaya</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="out">
+                    <!-- Cards injected here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- User Dashboard (Initial state: hidden) -->
+        <section id="user-dashboard" class="hidden">
+            <div class="flex items-center justify-between mb-12">
+                <h2 class="text-3xl font-black tracking-tighter">İstifadəçi Paneli</h2>
+                <div class="flex items-center gap-4">
+                    <div class="text-right">
+                        <p id="dash-user-email" class="text-xs font-black text-text-muted">user@example.com</p>
+                        <h3 id="dash-user-name" class="font-black text-sm">Xoş gəldiniz!</h3>
+                    </div>
+                    <div id="dash-avatar"
+                        class="w-12 h-12 rounded-2xl bg-surface border-2 border-accent flex items-center justify-center overflow-hidden">
+                        <i class="ri-user-smile-line text-xl text-accent"></i>
                     </div>
                 </div>
             </div>
-            </div>
-            <!-- Progress Bar -->
-            <div class="absolute bottom-0 left-0 w-full h-1 bg-white/10 z-30">
-                <div id="slide-progress" class="h-full bg-accent transition-all duration-[10000ms] linear"
-                    style="width: 0%"></div>
-            </div>
-            <!-- Slider Dots -->
-            <div id="hero-dots" class="absolute bottom-10 right-10 flex gap-3 z-20"></div>
-        </section>
 
-        <!-- Category Chips -->
-        <section class="mt-12 notranslate overflow-hidden">
-            <h3 class="text-[10px] font-black text-text-muted uppercase tracking-[0.3em] mb-8 text-center opacity-50">
-                Kategoriyalar</h3>
-            <div class="relative">
-                <div id="cat-chips" class="flex items-start gap-6 overflow-x-auto pb-8 pt-2 scrollbar-hide px-4 -mx-4">
-                    <button id="chip-all"
-                        class="flex flex-col items-center gap-3 shrink-0 transition-all active:scale-95 cat-chip active-chip group">
-                        <div
-                            class="w-16 h-16 rounded-2xl bg-white shadow-sm border border-accent flex items-center justify-center group-hover:shadow-md transition-all active-chip-bg">
-                            <i class="ri-apps-2-line text-2xl text-accent"></i>
-                        </div>
-                        <span
-                            class="text-[10px] font-black uppercase tracking-tight text-accent text-center">Hamısı</span>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Sidebar -->
+                <div class="flex flex-col gap-2">
+                    <button
+                        class="dash-nav-btn active px-6 py-4 rounded-2xl text-left font-bold text-sm flex items-center gap-3 transition-all">
+                        <i class="ri-shopping-bag-line"></i> Sifarişlərim
+                    </button>
+                    <button
+                        class="dash-nav-btn px-6 py-4 rounded-2xl text-left font-bold text-sm flex items-center gap-3 transition-all text-text-muted hover:bg-surface">
+                        <i class="ri-settings-3-line"></i> Parametrlər
                     </button>
                 </div>
-                <!-- Fade Gradients for scroll -->
-                <div
-                    class="absolute left-0 top-0 bottom-8 w-12 bg-gradient-to-r from-bg to-transparent pointer-events-none z-10">
-                </div>
-                <div
-                    class="absolute right-0 top-0 bottom-8 w-12 bg-gradient-to-l from-bg to-transparent pointer-events-none z-10">
-                </div>
-            </div>
 
-            <div class="flex justify-center mt-2 hidden">
-                <button id="cat-toggle"
-                    class="text-[10px] font-black uppercase tracking-widest text-text-muted hover:text-accent transition-all px-6 py-2 border border-border">
-                    Daha çox
-                </button>
-            </div>
-        </section>
-
-        <!-- Products Section -->
-        <section class="mt-16">
-            <div class="w-full flex justify-end items-center mb-6">
-                <a href="/products.html"
-                    class="flex items-center gap-2 px-5 py-2.5 bg-accent text-white text-[11px] font-black rounded-full hover:brightness-110 transition-all shadow-lg shadow-accent/20">
-                    Hamısını Göstər <i class="ri-arrow-right-line"></i>
-                </a>
-            </div>
-            <div class="hidden">
-                <p id="count-info"></p>
-            </div>
-            <div class="flex flex-wrap items-center gap-3">
-                <select id="cat" class="hidden">
-                    <option value="all">Hamısı</option>
-                </select>
-                <div class="relative">
-                    <select id="stock"
-                        class="appearance-none pl-10 pr-12 py-3 rounded-2xl border border-border bg-surface text-sm font-black outline-none cursor-pointer focus:border-accent group">
-                        <option value="all">Bütün Stoklar</option>
-                        <option value="in">Mevcut</option>
-                    </select>
-                    <i class="ri-stack-line absolute left-4 top-1/2 -translate-y-1/2 text-text-muted"></i>
-                    <i
-                        class="ri-arrow-down-s-line absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted"></i>
-                </div>
-                <div class="relative">
-                    <select id="limit"
-                        class="appearance-none pl-10 pr-12 py-3 rounded-2xl border border-border bg-surface text-sm font-black outline-none cursor-pointer focus:border-accent">
-                        <option value="24" selected>24</option>
-                        <option value="48">48</option>
-                    </select>
-                    <i class="ri-list-settings-line absolute left-4 top-1/2 -translate-y-1/2 text-text-muted"></i>
-                    <i
-                        class="ri-arrow-down-s-line absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted"></i>
-                </div>
-            </div>
-            </div>
-
-            <div id="loader" class="py-32 text-center text-lg font-black text-text-muted animate-pulse">Məhsullar
-                yüklənir...</div>
-            <div id="out" class="space-y-10 mt-6"></div>
-            <div id="pagination" class="mt-20 flex justify-center items-center gap-3"></div>
-        </section>
-
-        <!-- Brand Carousel Section -->
-        <section class="mt-32 border-y border-border/50 bg-surface/30 py-12 overflow-hidden relative notranslate">
-            <div class="max-w-[1400px] mx-auto px-5 md:px-10 mb-8">
-                <h3 class="text-[10px] font-black text-text-muted uppercase tracking-[0.4em] text-center">Partnyor
-                    Brendlər</h3>
-            </div>
-
-            <div class="flex items-center brand-carousel-fade">
-                <div class="brand-track flex items-center gap-20 animate-scroll">
-                    <img src="/brands/brand-1.svg"
-                        class="brand-logo grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all cursor-pointer object-contain"
-                        onerror="this.src='/brands/brand-fallback.svg'">
-                    <img src="/brands/brand-2.svg"
-                        class="brand-logo grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all cursor-pointer object-contain"
-                        onerror="this.src='/brands/brand-fallback.svg'">
-                    <img src="/brands/brand-3.svg"
-                        class="brand-logo grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all cursor-pointer object-contain"
-                        onerror="this.src='/brands/brand-fallback.svg'">
-                    <img src="/brands/brand-4.svg"
-                        class="brand-logo grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all cursor-pointer object-contain"
-                        onerror="this.src='/brands/brand-fallback.svg'">
-                    <img src="/brands/brand-5.svg"
-                        class="brand-logo grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all cursor-pointer object-contain"
-                        onerror="this.src='/brands/brand-fallback.svg'">
-                    <img src="/brands/brand-6.svg"
-                        class="brand-logo grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all cursor-pointer object-contain"
-                        onerror="this.src='/brands/brand-fallback.svg'">
-                    <img src="/brands/brand-7.svg"
-                        class="brand-logo grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all cursor-pointer object-contain"
-                        onerror="this.src='/brands/brand-fallback.svg'">
-                    <img src="/brands/brand-8.svg"
-                        class="brand-logo grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all cursor-pointer object-contain"
-                        onerror="this.src='/brands/brand-fallback.svg'">
-
-                    <!-- Repeated for infinite loop -->
-                    <img src="https://images.seeklogo.com/logo-png/39/2/pubg-mobile-logo-png_seeklogo-399111.png"
-                        class="h-10 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all cursor-pointer object-contain">
-                    <img src="https://download.logo.wine/logo/Riot_Games/Riot_Games-Logo.wine.png"
-                        class="h-10 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all cursor-pointer object-contain">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Valorant_logo_-_V_margin.svg/1200px-Valorant_logo_-_V_margin.svg.png"
-                        class="h-10 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all cursor-pointer object-contain">
-                    <img src="https://upload.wikimedia.org/wikipedia/en/thumb/3/30/Free_Fire_logo.png/250px-Free_Fire_logo.png"
-                        class="h-10 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all cursor-pointer object-contain">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/League_of_Legends_2019_vector.svg/1200px-League_of_Legends_2019_vector.svg.png"
-                        class="h-8 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all cursor-pointer object-contain">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Roblox_player_icon_black.svg/1024px-Roblox_player_icon_black.svg.png"
-                        class="h-10 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all cursor-pointer object-contain">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Grand_Theft_Auto_V_logo.svg/1200px-Grand_Theft_Auto_V_logo.svg.png"
-                        class="h-12 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all cursor-pointer object-contain">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Microsoft_logo_%282012%29.svg/960px-Microsoft_logo_%282012%29.svg.png"
-                        class="h-8 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all cursor-pointer object-contain">
+                <!-- Main Panel Area -->
+                <div class="md:col-span-2">
+                    <div id="dash-orders-view" class="bg-surface border border-border rounded-[32px] p-8 min-h-[400px]">
+                        <h3 class="font-black text-lg mb-6">Son Sifarişlər</h3>
+                        <div id="dash-orders-list" class="flex flex-col gap-4">
+                            <!-- Orders injected here -->
+                            <div class="py-20 text-center opacity-30 font-bold">Heç bir sifariş tapılmadı.</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
     </main>
 
-    <footer class="bg-zinc-950 text-white pt-24 pb-12 mt-24">
-        <div class="max-w-[1400px] mx-auto px-5 md:px-10">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-20">
-                <div class="space-y-8">
-                    <a href="/" class="text-3xl font-black tracking-tighter block">AZPIN-X</a>
-                    <p class="text-zinc-500 leading-relaxed text-sm font-medium">Rəqəmsal oyun dünyasının ən etibarlı
-                        ünvanı. Ən uyğun qiymətlərlə E-Pin və oyun pulları burada. Tecrübeli kadromuzla yanınızdayız.
-                    </p>
-                    <div class="flex gap-4">
-                        <a href="#"
-                            class="w-12 h-12 rounded-2xl bg-zinc-900 flex items-center justify-center hover:bg-accent hover:text-white transition-all text-xl"><i
-                                class="ri-instagram-line"></i></a>
-                        <a href="#"
-                            class="w-12 h-12 rounded-2xl bg-zinc-900 flex items-center justify-center hover:bg-accent hover:text-white transition-all text-xl"><i
-                                class="ri-twitter-x-line"></i></a>
-                        <a href="#"
-                            class="w-12 h-12 rounded-2xl bg-zinc-900 flex items-center justify-center hover:bg-accent hover:text-white transition-all text-xl"><i
-                                class="ri-discord-line"></i></a>
-                    </div>
-                </div>
-                <div>
-                    <h4 class="font-black text-sm uppercase tracking-widest mb-10 text-white">Sürətli Giriş</h4>
-                    <ul class="space-y-4 text-sm text-zinc-500 font-bold">
-                        <li><a href="/about.html" class="hover:text-accent transition-colors">Haqqımızda</a></li>
-                        <li><a href="/contact.html" class="hover:text-accent transition-colors">Əlaqə</a></li>
-                        <li><a href="/faq.html" class="hover:text-accent transition-colors">Tez-tez Verilən Suallar</a>
-                        </li>
-                        <li><a href="/catalog.html" class="hover:text-accent transition-colors">Məhsul Kataloqu</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-black text-sm uppercase tracking-widest mb-10 text-white">Hüquqi</h4>
-                    <ul class="space-y-4 text-sm text-zinc-500 font-bold">
-                        <li><a href="/terms.html" class="hover:text-accent transition-colors">İstifadə Qaydaları</a>
-                        </li>
-                        <li><a href="/privacy.html" class="hover:text-accent transition-colors">Məxfilik Siyasəti</a>
-                        </li>
-                        <li><a href="/refund.html" class="hover:text-accent transition-colors">Geri qaytarma
-                                şərtləri</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-black text-sm uppercase tracking-widest mb-10 text-white">Xəbərlər</h4>
-                    <p class="text-zinc-500 text-sm leading-relaxed mb-6 font-medium">Yeni endirimlərdən xəbərdar olmaq
-                        üçün abunə olun.</p>
-                    <div class="flex">
-                        <input type="email" placeholder="E-mail"
-                            class="bg-zinc-900 border-none rounded-l-xl px-4 py-3 text-sm focus:ring-1 focus:ring-accent outline-none w-full">
-                        <button class="bg-accent px-4 py-3 rounded-r-xl"><i class="ri-send-plane-fill"></i></button>
-                    </div>
-                </div>
+    <!-- Simple Login Modal -->
+    <div id="auth-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-8">
+                <h3 id="auth-title" class="text-2xl font-black tracking-tighter">Giriş</h3>
+                <button id="auth-close" class="p-2 hover:bg-surface rounded-xl"><i
+                        class="ri-close-line text-xl"></i></button>
             </div>
-            <div class="pt-10 border-t border-zinc-900 flex flex-col md:flex-row justify-between items-center gap-6">
-                <p class="text-xs text-zinc-600 font-bold">&copy; 2026 AZPIN-X. Bütün hüquqlar qorunur.</p>
-                <div class="flex gap-6 opacity-30 grayscale hover:opacity-100 transition-all cursor-pointer">
-                    <i class="ri-visa-line text-3xl"></i>
-                    <i class="ri-mastercard-line text-3xl"></i>
-                    <i class="ri-paypal-line text-3xl"></i>
+
+            <form id="auth-form" class="flex flex-col gap-4">
+                <input type="email" id="auth-email" placeholder="E-poçt"
+                    class="p-4 bg-surface border border-border rounded-xl outline-none focus:border-accent transition-all font-medium">
+                <input type="password" id="auth-password" placeholder="Şifrə"
+                    class="p-4 bg-surface border border-border rounded-xl outline-none focus:border-accent transition-all font-medium">
+                <p id="auth-error" class="text-xs text-accent font-bold hidden"></p>
+                <button type="submit" class="btn-primary py-4 mt-2">Daxil Ol</button>
+                <div class="text-center mt-4">
+                    <button type="button" id="auth-switch"
+                        class="text-xs font-bold text-text-muted hover:text-accent">Hesabınız yoxdur? Qeydiyyat</button>
                 </div>
-            </div>
+            </form>
         </div>
-    </footer>
+    </div>
+
+    <!-- Global Cart Drawer Placeholder -->
+    <div id="cart-drawer" class="hidden"></div>
+    <div id="notif-container" class="fixed bottom-8 right-8 z-[10000] flex flex-col gap-4"></div>
+
+    <div id="loader">AZPIN-X</div>
 
     <script type="module" src="/src/main.js"></script>
-    <script>
-        window.gtranslateSettings = {
-            "default_language": "az",
-            "languages": ["az", "tr", "ru", "en"],
-            "wrapper_selector": ".gtranslate_wrapper"
-        }
-    </script>
-    <script src="https://cdn.gtranslate.net/widgets/latest/lc.js" defer></script>
-
-    <!-- Auth Modal -->
-    <div id="auth-modal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-[10001] p-4">
-        <div
-            class="w-full max-w-[480px] bg-white text-black border border-border shadow-2xl rounded-2xl overflow-hidden">
-            <div class="flex items-center justify-between px-6 py-4 border-b border-border">
-                <h3 class="text-sm font-black uppercase tracking-widest text-text">Hesab</h3>
-                <button id="auth-close"
-                    class="w-10 h-10 flex items-center justify-center hover:bg-zinc-100 transition-colors">
-                    <i class="ri-close-line text-2xl"></i>
-                </button>
-            </div>
-            <div class="px-6 pt-4">
-                <div class="flex gap-2 text-[11px] font-black uppercase tracking-widest">
-                    <button id="tab-login" class="px-4 py-2 border border-accent text-accent bg-accent/5">Giriş</button>
-                    <button id="tab-register" class="px-4 py-2 border border-border text-text-muted">Qeydiyyat</button>
-                </div>
-            </div>
-            <div class="p-6 space-y-4">
-                <form id="login-form" class="space-y-4">
-                    <input id="login-email" type="email" placeholder="E-mail"
-                        class="w-full px-4 py-3 border border-border bg-white text-sm font-medium outline-none focus:border-accent/40">
-                    <input id="login-password" type="password" placeholder="Şifrə"
-                        class="w-full px-4 py-3 border border-border bg-white text-sm font-medium outline-none focus:border-accent/40">
-                    <button type="submit"
-                        class="w-full py-4 bg-accent text-white font-black uppercase tracking-widest text-xs">
-                        Daxil ol
-                    </button>
-                </form>
-                <form id="register-form" class="space-y-4 hidden">
-                    <input id="register-email" type="email" placeholder="E-mail"
-                        class="w-full px-4 py-3 border border-border bg-white text-sm font-medium outline-none focus:border-accent/40">
-                    <input id="register-password" type="password" placeholder="Şifrə"
-                        class="w-full px-4 py-3 border border-border bg-white text-sm font-medium outline-none focus:border-accent/40">
-                    <button type="submit"
-                        class="w-full py-4 bg-accent text-white font-black uppercase tracking-widest text-xs">
-                        Qeydiyyat
-                    </button>
-                </form>
-                <p id="auth-message" class="text-xs font-bold text-text-muted"></p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Profile Modal -->
-    <div id="profile-modal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-[10002] p-4">
-        <div class="w-full max-w-[640px] bg-white text-black border border-border shadow-2xl overflow-hidden">
-            <div class="flex items-center justify-between px-6 py-4 border-b border-border">
-                <h3 class="text-sm font-black uppercase tracking-widest text-text">Profil Ayarları</h3>
-                <button id="profile-close"
-                    class="w-10 h-10 flex items-center justify-center hover:bg-zinc-100 transition-colors">
-                    <i class="ri-close-line text-2xl"></i>
-                </button>
-            </div>
-            <div class="p-6 space-y-6">
-                <div class="flex items-center gap-4">
-                    <div class="w-16 h-16 bg-zinc-100 overflow-hidden flex items-center justify-center">
-                        <img id="profile-avatar" src="https://dummyimage.com/120x120/f1f5f9/94a3b8.png?text=AZPIN-X"
-                            class="w-full h-full object-cover" alt="Avatar">
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-[11px] font-black uppercase tracking-widest text-text-muted">Avatar</p>
-                        <input id="profile-avatar-input" type="file" accept="image/*" class="mt-2 text-xs font-bold">
-                    </div>
-                </div>
-
-                <div class="space-y-3">
-                    <p class="text-[11px] font-black uppercase tracking-widest text-text-muted">Profil</p>
-                    <div class="grid grid-cols-2 gap-3">
-                        <input id="profile-first-name" type="text" placeholder="Ad"
-                            class="w-full px-4 py-3 border border-border bg-white text-sm font-medium outline-none focus:border-accent/40">
-                        <input id="profile-last-name" type="text" placeholder="Soyad"
-                            class="w-full px-4 py-3 border border-border bg-white text-sm font-medium outline-none focus:border-accent/40">
-                    </div>
-                </div>
-
-                <div class="space-y-3">
-                    <p class="text-[11px] font-black uppercase tracking-widest text-text-muted">Əlaqə</p>
-                    <div class="flex gap-2">
-                        <select id="profile-country"
-                            class="appearance-none px-3 py-3 border border-border bg-white text-sm font-black outline-none focus:border-accent/40 pr-8 bg-no-repeat bg-[length:12px_12px] bg-[right_0.75rem_center] bg-[url('data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 20 20\' fill=\'%2394a3b8\'><path d=\'M5.5 7.5L10 12l4.5-4.5\'/></svg>')]">
-                            <option value="+994" selected>🇦🇿 +994</option>
-                            <option value="+90">🇹🇷 +90</option>
-                            <option value="+7">🇷🇺 +7</option>
-                        </select>
-                        <input id="profile-phone" type="text" placeholder="GSM nömrəsi"
-                            class="flex-1 px-4 py-3 border border-border bg-white text-sm font-medium outline-none focus:border-accent/40">
-                    </div>
-                    <div class="grid grid-cols-[1fr,140px] gap-3">
-                        <input id="profile-otp-code" type="text" placeholder="OTP kodu"
-                            class="w-full px-4 py-3 border border-border bg-white text-sm font-medium outline-none focus:border-accent/40">
-                        <button id="profile-otp-send"
-                            class="w-full py-3 border border-accent text-accent font-black text-xs uppercase tracking-widest bg-accent/5">
-                            OTP göndər
-                        </button>
-                    </div>
-                    <p class="text-[11px] text-zinc-500 font-bold">
-                        Onay kodunuz WhatsApp’tan HubMSG sistemi üzerinden gönderilecektir.
-                    </p>
-                    <button id="profile-otp-verify"
-                        class="w-full py-3 border border-accent text-accent font-black text-xs uppercase tracking-widest bg-accent/5">
-                        OTP təsdiqlə
-                    </button>
-                </div>
-
-                <div class="space-y-3">
-                    <p class="text-[11px] font-black uppercase tracking-widest text-text-muted">Təhlükəsizlik</p>
-                    <div class="grid grid-cols-2 gap-3">
-                        <input id="profile-email" type="email" placeholder="Yeni E-mail"
-                            class="w-full px-4 py-3 border border-border bg-white text-sm font-medium outline-none focus:border-accent/40">
-                        <button id="profile-email-btn"
-                            class="w-full py-3 bg-accent text-white font-black text-xs uppercase tracking-widest">
-                            E-maili yenilə
-                        </button>
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <input id="profile-password" type="password" placeholder="Yeni Şifrə"
-                            class="w-full px-4 py-3 border border-border bg-white text-sm font-medium outline-none focus:border-accent/40">
-                        <button id="profile-password-btn"
-                            class="w-full py-3 bg-accent text-white font-black text-xs uppercase tracking-widest">
-                            Şifrəni yenilə
-                        </button>
-                    </div>
-                </div>
-
-                <button id="profile-save"
-                    class="w-full py-4 bg-accent text-white font-black text-xs uppercase tracking-widest">
-                    Məlumatları yadda saxla
-                </button>
-                <p id="profile-message" class="text-xs font-bold text-text-muted"></p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Orders Modal -->
-    <div id="orders-modal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-[10002] p-4">
-        <div class="w-full max-w-[720px] bg-white text-black border border-border shadow-2xl overflow-hidden">
-            <div class="flex items-center justify-between px-6 py-4 border-b border-border">
-                <h3 class="text-sm font-black uppercase tracking-widest text-text">Sifarişlərim</h3>
-                <button id="orders-close"
-                    class="w-10 h-10 flex items-center justify-center hover:bg-zinc-100 transition-colors">
-                    <i class="ri-close-line text-2xl"></i>
-                </button>
-            </div>
-            <div id="orders-list" class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
-                <!-- Orders injected by JS -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Success Modal -->
-    <div id="success-modal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-[10003] p-4">
-        <div class="w-full max-w-[420px] bg-white text-black border border-border shadow-2xl p-8 text-center">
-            <div class="w-16 h-16 mx-auto bg-accent text-white flex items-center justify-center text-3xl">
-                🙂
-            </div>
-            <h3 class="text-sm font-black uppercase tracking-widest mt-4">Təşəkkür edirik!</h3>
-            <div class="mt-3 text-sm text-zinc-700 font-bold space-y-1">
-                <div>Sifariş №: <span id="success-order-id" class="text-black">-</span></div>
-                <div>Tarix: <span id="success-order-date" class="text-black">-</span></div>
-            </div>
-            <p class="text-sm text-zinc-600 font-medium mt-3">
-                Ödənişiniz təsdiqləndikdə sizə GSM və ya e‑poçt vasitəsilə məlumat göndəriləcək.
-                Profilim → Sifarişlərim bölməsindən dekont yükləməyiniz prosesi sürətləndirəcək.
-            </p>
-            <button id="success-close"
-                class="mt-6 px-6 py-3 border border-accent text-accent text-xs font-black uppercase tracking-widest">
-                Bağla
-            </button>
-        </div>
-    </div>
-    <!-- Notifications Container -->
-    <div id="notif-container" class="fixed bottom-8 right-8 z-[20000] flex flex-col gap-3"></div>
 </body>
 
 </html>
