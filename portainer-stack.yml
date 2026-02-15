@@ -14,7 +14,7 @@ services:
       - internal
 
   azpin-backend:
-    image: local/azpin-backend:latest
+    image: azpin-backend:latest
     pull_policy: never
     container_name: azpin-backend
     restart: unless-stopped
@@ -34,7 +34,7 @@ services:
       - internal
 
   azpin-frontend:
-    image: local/azpin-frontend:latest
+    image: azpin-frontend:latest
     pull_policy: never
     container_name: azpin-frontend
     restart: unless-stopped
