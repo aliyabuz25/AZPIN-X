@@ -45,12 +45,16 @@ docker build -t azpin-frontend:local -f Dockerfile.frontend .
 4. `Deploy the stack` düyməsinə basın.
 
 ### 5. Yapılandırma Detayları
-Sistem üç ana konteynerdan oluşur:
-1. **azpin-db**: MySQL verilənlər bazası.
-2. **azpin-backend**: API və Auth server.
-3. **azpin-frontend**: Statik fayllar və Nginx proxy.
+Sistem üç ana konteynerdan oluşur ve **Internal Bridge Network** üzerinden haberleşir:
 
-Traefik həm API (`/api`), həm də Frontend yollarını avtomatik olaraq `Host: azpinx.com` üzərinə yönləndirir.
+1.  **azpin-db (MySQL 8.0)**: Veritabanı motoru. Dışarıya kapalıdır.
+2.  **azpin-backend (NodeJS)**: API, Auth və dosya yükleme işlemlerini yönetir. **azpin-db** container adı ilə bazaya bağlanır.
+3.  **azpin-frontend (Nginx)**: Statik arayüzü sunar ve Reverse Proxy görevi görür.
+    - `/` -> Frontend Statics
+    - `/api` -> `http://azpin-backend:5174/api/` (Container name vasitəsilə internal proxy)
+    - `/uploads` -> `http://azpin-backend:5174/uploads` (Container name vasitəsilə internal proxy)
+
+Traefik, tüm trafiği (Host: `azpinx.com`) sadece **azpin-frontend** konteynerine yönlendirir. Frontend isə lazım olan sorğuları daxili şəbəkə üzərindən backend-ə ötürür.
 
 ### 6. Geliştirme (Local)
 Yerel ortamda geliştirmek için:

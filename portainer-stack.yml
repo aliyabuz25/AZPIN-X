@@ -31,25 +31,20 @@ services:
       - /datastore/azpin/uploads:/app/public/uploads
     networks:
       - internal
-      - edge
-    labels:
-      - 'traefik.enable=true'
-      - 'traefik.docker.network=edge'
-      - 'traefik.http.routers.azpin-api.rule=(Host(`azpinx.com`) || Host(`azpinx.octotech.az`)) && PathPrefix(`/api`)'
-      - 'traefik.http.routers.azpin-api.entrypoints=web'
-      - 'traefik.http.services.azpin-api.loadbalancer.server.port=5174'
 
   azpin-frontend:
     image: azpin-frontend:local
     container_name: azpin-frontend
     restart: unless-stopped
+    depends_on:
+      - azpin-backend
     networks:
       - internal
       - edge
     labels:
       - 'traefik.enable=true'
       - 'traefik.docker.network=edge'
-      - 'traefik.http.routers.azpin.rule=(Host(`azpinx.com`) || Host(`azpinx.octotech.az`)) && !PathPrefix(`/api`)'
+      - 'traefik.http.routers.azpin.rule=Host(`azpinx.com`) || Host(`azpinx.octotech.az`)'
       - 'traefik.http.routers.azpin.entrypoints=web'
       - 'traefik.http.services.azpin.loadbalancer.server.port=80'
     volumes:
