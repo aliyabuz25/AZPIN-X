@@ -10,17 +10,18 @@ echo "📥 Kodlar yenilənir (git pull)..."
 git pull origin main
 
 # 2. Backend build
-echo "📦 Backend imajı build olunur..."
-docker build -t azpin-backend:latest -f Dockerfile.backend .
+echo "📦 Backend imajı build olunur (Force Rebuild)..."
+docker build --no-cache -t azpin-backend:latest -f Dockerfile.backend .
 
 # 3. Frontend build
-echo "📦 Frontend imajı build olunur..."
-docker build -t azpin-frontend:latest -f Dockerfile.frontend .
+echo "📦 Frontend imajı build olunur (Force Rebuild)..."
+docker build --no-cache -t azpin-frontend:latest -f Dockerfile.frontend .
 
 echo ""
-echo "✅ UĞURLU! İmajlar hazırdır."
+echo "✅ UĞURLU! İmajlar qəti şəkildə yeniləndi."
 echo "------------------------------------------------"
-echo "İndi Portainer-ə daxil olun və Stack-i 'Update' edin."
-echo "Qeyd: portainer-stack.yml daxilində pull_policy: never olduğu üçün"
-echo "Portainer artıq birbaşa bu yerli imajları istifadə edəcək."
+echo "İndi Portainer-ə daxil olun:"
+echo "1. Stack bölməsində 'Update the stack' seçin."
+echo "2. 'Re-create containers' (və ya 'Pull latest image') toggle-ını mütləq AÇIN."
+echo "3. 'Update' düyməsinə basın."
 echo "------------------------------------------------"
