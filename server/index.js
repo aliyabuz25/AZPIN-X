@@ -7,7 +7,7 @@ import { fileURLToPath } from 'url'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { v4 as uuidv4 } from 'uuid'
-import pool from './db.js'
+import pool, { initDB } from './db.js'
 
 const app = express()
 const __filename = fileURLToPath(import.meta.url)
@@ -280,6 +280,16 @@ app.get('/api/products', async (_req, res) => {
 app.get('/d-admin', (req, res) => res.sendFile(path.join(DIST_DIR, 'pin-admin.html')))
 app.get(/.*/, (req, res) => res.sendFile(path.join(DIST_DIR, 'index.html')))
 
-const PORT = process.env.PORT || 5174
-app.listen(PORT, () => console.log(`Server running on ${PORT}`))
+const start = async () => {
+    try {
+        await initDB()
+        const PORT = process.env.PORT || 5174
+        app.listen(PORT, () => console.log(`Server running on ${PORT}`))
+    } catch (err) {
+        console.error('Failed to start server:', err)
+        process.exit(1)
+    }
+}
+
+start()
 

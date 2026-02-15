@@ -17,13 +17,14 @@ const pool = mysql.createPool({
     multipleStatements: true
 });
 
-async function initDB() {
+export async function initDB() {
     console.log('Starting database initialization check...');
     try {
         const schemaPath = path.join(__dirname, '..', 'schema.sql');
         console.log(`Looking for schema at: ${schemaPath}`);
         if (fs.existsSync(schemaPath)) {
             const schema = fs.readFileSync(schemaPath, 'utf8');
+            // Execute schema. multipleStatements: true is important here.
             await pool.query(schema);
             console.log('✅ Database schema applied successfully');
         } else {
@@ -32,9 +33,8 @@ async function initDB() {
         }
     } catch (err) {
         console.error('❌ Database initialization FAILED:', err.message);
+        throw err; // Propagate error to crash server on failed init
     }
 }
-
-initDB();
 
 export default pool;
